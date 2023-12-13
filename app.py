@@ -43,14 +43,12 @@ def register():
         confirmation = request.form.get("confirmation")
         user_type = request.form.get("reg-type")
 
-        # if data is valid, users table is created
+        # checking if data is valid
         if not username:
             return apology("No username provided")
         elif not password:
             return apology("No password provided")
-        elif not confirmation:
-            return apology("Password not confirmed")
-        elif confirmation != password:
+        elif not confirmation or confirmation != password:
             return apology("Passwords are not matching")
         elif not user_type:
             return apology("Please specify the registration type")
@@ -67,6 +65,38 @@ def register():
         
         
 
-@app.route("/login")
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    return apology("to do", 400)
+
+    # forget any user_id stored in session
+    session["user_id"] = ""
+
+    # user sent a POST request
+    if request.method == "POST":
+
+        # checking is pass and username is provided
+
+        # Ensure username was submitted
+        if not request.form.get("username"):
+            return apology("must provide username", 403)
+        elif not request.form.get("password"):
+            return apology("must provide password", 403)
+        
+        # query db for username
+        rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username"))
+
+        # check if username is provided and if password is correct
+        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
+            return apology("invalid username and/or password", 403)
+        
+        # remember which user has logged in
+        session["user_id"] = rows[0]["id"]
+
+        # remember if user is client or trainer
+        session["user_type"] = rows[0]["user_type"]
+
+        return redirect("/")
+    
+    # if user reached via GET
+    else:
+        return render_template("login.html")

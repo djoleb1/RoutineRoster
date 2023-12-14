@@ -9,6 +9,8 @@ app = Flask(__name__)
 
 db = SQL("sqlite:///routineroster.db")
 
+types = ["client", "trainer"]
+
 db.execute("""CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
                        username TEXT NOT NULL, 
                        hash TEXT NOT NULL, 
@@ -35,7 +37,7 @@ def index():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "GET":
-        return render_template("register.html")
+        return render_template("register.html", types=types)
     else:
         # if request is POST - fetching data from frontend
         username = request.form.get("username")
@@ -69,14 +71,12 @@ def register():
 def login():
 
     # forget any user_id stored in session
-    session["user_id"] = ""
+    session.clear()
 
     # user sent a POST request
     if request.method == "POST":
 
         # checking is pass and username is provided
-
-        # Ensure username was submitted
         if not request.form.get("username"):
             return apology("must provide username", 403)
         elif not request.form.get("password"):

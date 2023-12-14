@@ -13,7 +13,7 @@
     <link href="/static/favicon.ico" rel="icon">
     <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 
     <title>RoutineRoster: {% block title %}{% endblock %}</title>
 </head>

@@ -18,11 +18,10 @@
         </div>
         <div>
             <p>Register as:</p>
-            <input type="radio" id="trainer" value="Trainer" name="reg-type">
-            <label for="trainer">Trainer</label><br>
-
-            <input type="radio" id="client" value="Client" name="reg-type">
-            <label for="trainer">Client</label><br>
+            {% for type in types %}
+                <input type="radio" id="{{ type }}" value="{{ type }}" name="reg-type">
+                <label for="trainer">{{ type.title() }}</label><br>
+            {% endfor %}
         </div>
         <div>
             <button type="submit">Register</button>

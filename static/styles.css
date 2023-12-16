@@ -52,6 +52,9 @@ footer {
     padding: 10px 0;
 }
 
+
+
+
 @media(max-width:768px){
     .hamburger {
         display: block;

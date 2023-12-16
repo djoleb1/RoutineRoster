@@ -1,9 +1,11 @@
+import os
 from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
-from helpers import apology, login_required
+from helpers import apology, login_required, allowed_file
 
 app = Flask(__name__)
 
@@ -11,13 +13,18 @@ db = SQL("sqlite:///routineroster.db")
 
 types = ["client", "trainer"]
 
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
 db.execute("""CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
                        username TEXT NOT NULL, 
                        hash TEXT NOT NULL, 
                        user_type TEXT NOT NULL);""")
 
+
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 Session(app)
 
 @app.after_request
@@ -66,7 +73,6 @@ def register():
         return redirect("/")
         
         
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -100,3 +106,34 @@ def login():
     # if user reached via GET
     else:
         return render_template("login.html")
+    
+@app.route("/logout")
+def logout():
+
+    # Forget any user_id
+    session.clear()
+
+    # Redirect user to login form
+    return redirect("/")
+
+
+@app.route("/account", methods=["GET", "POST"])
+@login_required
+def my_account():
+    if request.method == "GET":
+        return render_template("account.html")
+    else:
+        full_name = request.form["full_name"]
+        profile_picture = request.files["profile_picture"]
+
+        if full_name and profile_picture and allowed_file(profile_picture.filename, ALLOWED_EXTENSIONS):
+            filename = secure_filename(profile_picture.filename, )
+            profile_picture.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+            print(f"Full name is {full_name}")
+            print(f"Profile picture is: {profile_picture}")
+            flash('Profile updated successfully!', 'success')
+            return redirect('/')
+        
+        else:
+            return apology("Invalid file format or missing information")

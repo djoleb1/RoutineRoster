@@ -21,6 +21,11 @@ db.execute("""CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCRE
                        hash TEXT NOT NULL, 
                        user_type TEXT NOT NULL);""")
 
+db.execute("""CREATE TABLE IF NOT EXISTS user_info ( 
+                    users_id INTEGER, 
+                    full_name TEXT NOT NULL, 
+                    profile_picture TEXT NOT NULL,
+                    FOREIGN KEY(users_id) REFERENCES users(id));""")
 
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
@@ -123,15 +128,21 @@ def my_account():
     if request.method == "GET":
         return render_template("account.html")
     else:
+        # fetching data from frontend
         full_name = request.form["full_name"]
         profile_picture = request.files["profile_picture"]
-
+        # checking if full name and picture is provided and if picture is in correct format
         if full_name and profile_picture and allowed_file(profile_picture.filename, ALLOWED_EXTENSIONS):
-            filename = secure_filename(profile_picture.filename, )
+
+            # secure filename checks if there are any dangerous or unwanted parts from the file name
+            filename = secure_filename(profile_picture.filename)
+
+            # saving the uploaded picture to uploads folder
             profile_picture.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-            print(f"Full name is {full_name}")
-            print(f"Profile picture is: {profile_picture}")
+            picture_path = f"uploads/{filename}"
+            db.execute("INSERT INTO user_info (users_id, full_name, profile_picture) VALUES (?, ?, ?)", session["user_id"], full_name, picture_path)
+
             flash('Profile updated successfully!', 'success')
             return redirect('/')
         

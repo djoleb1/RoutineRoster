@@ -6,7 +6,7 @@
 
 {% block main %}
     <form method="post" action="/account" enctype="multipart/form-data">
-        <input type="text" name="full_name" placeholder="Full Name"><br>
+        <input type="text" name="full_name" placeholder="Full Name" autocomplete="off" autofocus><br>
         <input type="file" name="profile_picture"><br>
         <input type="submit" value="Save">
     </form>

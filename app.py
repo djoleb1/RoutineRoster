@@ -13,7 +13,7 @@ db = SQL("sqlite:///routineroster.db")
 
 types = ["client", "trainer"]
 
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = 'static'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 db.execute("""CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
@@ -23,8 +23,8 @@ db.execute("""CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCRE
 
 db.execute("""CREATE TABLE IF NOT EXISTS user_info ( 
                     users_id INTEGER, 
-                    full_name TEXT NOT NULL, 
-                    profile_picture TEXT NOT NULL,
+                    full_name TEXT, 
+                    profile_picture TEXT,
                     FOREIGN KEY(users_id) REFERENCES users(id));""")
 
 app.config["SESSION_PERMANENT"] = False
@@ -72,7 +72,7 @@ def register():
         if len(rows) != 0:
             return apology("username is already taken")
         
-        db.execute("INSERT INTO users (username, hash, user_type) VALUES (?, ?, ?)", username, generate_password_hash(request.form.get("password")), user_type)
+        db.execute("INSERT INTO users (username, hash, user_type) VALUES (?, ?, ?);", username, generate_password_hash(request.form.get("password")), user_type)
 
         flash(f"Successfully registered a new {user_type} account as {username}!")
         return redirect("/")
@@ -106,6 +106,11 @@ def login():
         # remember if user is client or trainer
         session["user_type"] = rows[0]["user_type"]
 
+        # storing id in info table so user can later upload pfp and full name if user is not present in DB
+        user_query = db.execute("SELECT * FROM user_info WHERE users_id = ?;", session["user_id"])
+        if not user_query:
+            db.execute("INSERT INTO user_info (users_id, profile_picture) VALUES (?, ?);", session["user_id"], "static/default.jpg")
+        
         return redirect("/")
     
     # if user reached via GET
@@ -126,7 +131,16 @@ def logout():
 @login_required
 def my_account():
     if request.method == "GET":
-        return render_template("account.html")
+        username = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])
+        # if user already has a pfp and full name in DB
+        try:
+            data = db.execute("SELECT profile_picture, full_name FROM user_info WHERE users_id = ?", session["user_id"])
+            pfp = data[0]["profile_picture"]
+            fname = data[0]["full_name"]
+            return render_template("account.html", pfp=pfp.rsplit('/')[1], fname=fname, username=username[0]["username"])
+        # if user doesn't have a pfp and full name in db
+        except IndexError:
+            return render_template("account.html", username=username[0]["username"])
     else:
         # fetching data from frontend
         full_name = request.form["full_name"]
@@ -141,7 +155,7 @@ def my_account():
             profile_picture.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
             picture_path = f"uploads/{filename}"
-            db.execute("INSERT INTO user_info (users_id, full_name, profile_picture) VALUES (?, ?, ?)", session["user_id"], full_name, picture_path)
+            db.execute("UPDATE user_info SET full_name = ?, profile_picture = ? WHERE users_id = ?",full_name, picture_path, session["user_id"])
 
             flash('Profile updated successfully!', 'success')
             return redirect('/')

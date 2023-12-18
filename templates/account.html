@@ -4,10 +4,31 @@
     My account
 {% endblock %}
 
-{% block main %}
-    <form method="post" action="/account" enctype="multipart/form-data">
-        <input type="text" name="full_name" placeholder="Full Name" autocomplete="off" autofocus><br>
-        <input type="file" name="profile_picture"><br>
-        <input type="submit" value="Save">
-    </form>
+{% block main %}    
+    
+        <div class="mb-3">
+            {% if not fname %}
+                
+                <img class="profile-picture" src="{{ url_for('static', filename='default.jpg' ) }}" alt="image">
+                <h3>{{ username }}</h3>
+                
+            {% elif fname %}
+
+                <h3>{{ fname.title() }}</h3>
+                <img class="profile-picture" src="{{ url_for('static', filename=pfp ) }}" alt="image">
+                <h3>{{ username }}</h3>
+
+            {% endif %}
+        </div>
+
+    <div class="mb-3">
+        <form method="post" action="/account" enctype="multipart/form-data">
+            <div class="mb-3 account-inp">
+                <input type="text" name="full_name" placeholder="Full Name" autocomplete="off" autofocus><br>
+                <input type="file" name="profile_picture"><br>
+            </div>
+            <input type="submit" value="Save">
+        </form>
+    </div>
+    
 {% endblock %}

@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 db = SQL("sqlite:///routineroster.db")
 
-types = ["client", "trainer"]
+TYPES = {"client", "trainer"}
 
 UPLOAD_FOLDER = 'static'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -49,7 +49,7 @@ def index():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "GET":
-        return render_template("register.html", types=types)
+        return render_template("register.html", types=TYPES)
     else:
         # if request is POST - fetching data from frontend
         username = request.form.get("username")

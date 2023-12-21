@@ -136,8 +136,9 @@ def my_account():
         try:
             data = db.execute("SELECT profile_picture, full_name FROM user_info WHERE users_id = ?", session["user_id"])
             pfp = data[0]["profile_picture"]
+            pfp = pfp.rsplit('/')[1]
             fname = data[0]["full_name"]
-            return render_template("account.html", pfp=pfp.rsplit('/')[1], fname=fname, username=username[0]["username"])
+            return render_template("account.html", pfp=pfp, fname=fname, username=username[0]["username"])
         # if user doesn't have a pfp and full name in db
         except IndexError:
             return render_template("account.html", username=username[0]["username"])
@@ -162,3 +163,11 @@ def my_account():
         
         else:
             return apology("Invalid file format or missing information")
+        
+@app.route("/trainers", methods=["GET", "POST"])
+@login_required
+def trainers():
+    if request.method == "GET":
+        trainers = db.execute("SELECT id, user_type, full_name, profile_picture FROM users JOIN user_info ON users.id = user_info.users_id WHERE user_type = 'trainer';")
+        print(trainers)
+        return render_template("trainers.html", trainers=trainers)

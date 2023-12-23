@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Trainers
+{% endblock %}
+
+{% block main %}
+    <div class="main-wrapper">
+        <div class="home-follow" id="trainersContainer">
+            {% if trainers %}
+    
+            {% for trainer in trainers %}
+                <div class="trainer-card">
+                    <div class="image-container">
+                        <img src="{{ url_for('static', filename=trainer.profile_picture ) }}" alt="Profile picture" class="home-follow-image">
+                    </div>
+                    <div class="main-follow-handles">
+                        <h6 class="card-title"><b>{{ trainer.full_name}}</b></h6>
+                        <p>@{{ trainer.username }}</p>
+                    </div>
+                    <a href="#" class="btn home-follow-btn">Follow</a>   
+                </div>
+            {% endfor %}
+            <button id="show-more-btn">Show More</button>
+                
+        {% else %}
+            <h3>Sorry, there are no trainers currently registered!</h3>
+        {% endif %}
+    
+        </div>
+    
+        <div class="home-main">
+    
+        </div>
+    </div>
+
+
+
+{% endblock %}

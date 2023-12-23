@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     background-color: #f0f5f9;
     font-family: Arial, sans-serif;
@@ -56,6 +60,46 @@ footer {
     width: 150px;
     height: 150px;
     border-radius: 50%;
+}
+
+.home-follow {
+    width: 20rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.image-container {
+    width: 3.8rem;
+    height: 3.8rem;
+    display: flex;
+    border-radius: 50%;
+    overflow: hidden;
+}
+.home-follow-image {
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+}
+
+.home-follow-btn {
+    background-color: #2196f3;
+    color: #f0f5f9;
+    border-radius: 20px;
+    height: min-content;
+    margin: auto 0.5rem;
+}
+
+.trainer-card {
+    display: flex;
+}
+
+.main-follow-handles {
+    width: 10rem;
+}
+
+#show-more-btn {
+    border: none;
+    background: none;
 }
 
 .account-inp {

@@ -1,6 +1,6 @@
 import os
 from cs50 import SQL
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, redirect, jsonify, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
@@ -136,7 +136,6 @@ def my_account():
         try:
             data = db.execute("SELECT profile_picture, full_name FROM user_info WHERE users_id = ?", session["user_id"])
             pfp = data[0]["profile_picture"]
-            pfp = pfp.rsplit('/')[1]
             fname = data[0]["full_name"]
             return render_template("account.html", pfp=pfp, fname=fname, username=username[0]["username"])
         # if user doesn't have a pfp and full name in db
@@ -155,7 +154,7 @@ def my_account():
             # saving the uploaded picture to uploads folder
             profile_picture.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-            picture_path = f"uploads/{filename}"
+            picture_path = filename
             db.execute("UPDATE user_info SET full_name = ?, profile_picture = ? WHERE users_id = ?",full_name, picture_path, session["user_id"])
 
             flash('Profile updated successfully!', 'success')
@@ -164,10 +163,31 @@ def my_account():
         else:
             return apology("Invalid file format or missing information")
         
-@app.route("/trainers", methods=["GET", "POST"])
+@app.route("/home", methods=["GET", "POST"])
 @login_required
 def trainers():
+    
     if request.method == "GET":
-        trainers = db.execute("SELECT id, user_type, full_name, profile_picture FROM users JOIN user_info ON users.id = user_info.users_id WHERE user_type = 'trainer';")
+        trainers = []
+        rows = db.execute("SELECT id, username, user_type, full_name, profile_picture FROM users JOIN user_info ON users.id = user_info.users_id WHERE user_type = 'trainer';")
+        for i in range(3):
+            trainers.append(rows[i])
         print(trainers)
-        return render_template("trainers.html", trainers=trainers)
+        return render_template("home.html", trainers=trainers)
+    
+@app.route("/show_more_trainers", methods=["GET"])
+@login_required
+def fetch_more_trainers():
+    trainers = []
+    # Logic to fetch more trainers (e.g., next set of trainers after the initial ones)
+    # Assuming you already have a logic for pagination or getting the next set of trainers
+    rows = db.execute("SELECT id, username, user_type, full_name, profile_picture FROM users JOIN user_info ON users.id = user_info.users_id WHERE user_type = 'trainer' LIMIT 3 OFFSET 3;")
+    for row in rows:
+        trainers.append({
+            'id': row["id"],
+            'username': row["username"],
+            'user_type': row["user_type"],
+            'full_name': row["full_name"],
+            'profile_picture': row["profile_picture"]
+        })
+    return jsonify({'trainers': trainers})

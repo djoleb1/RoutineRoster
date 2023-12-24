@@ -11,7 +11,9 @@
                 
                 <img class="profile-picture" src="{{ url_for('static', filename='default.jpg' ) }}" alt="image">
                 <h3>{{ username }}</h3>
-
+                {% if session["user_type"] == "trainer" %}
+                    <p>You won't appear in client's homepage if you don't set a full name and a profile picture!</p>
+                {% endif %}
                 <div class="mb-3">
                     <form method="post" action="/account" enctype="multipart/form-data">
                         <div class="mb-3 account-inp">

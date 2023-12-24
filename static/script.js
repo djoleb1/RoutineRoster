@@ -1,17 +1,8 @@
-let hamburger = document.querySelector('.hamburger');
+
 let navbar = document.querySelector('.navbar');
+const showMoreBtn = document.getElementById('show-more-btn')
 
-hamburger.addEventListener('click', function(){
-    hamburger.classList.toggle('active');
-    navbar.classList.toggle('active');
-})
-
-document.querySelectorAll('.nav-link').forEach(n => n.addEventListener('click', function(){
-    hamburger.classList.remove('active');
-    navbar.classList.remove('active');
-}))
-
-document.getElementById('show-more-btn').addEventListener('click', function() {
+showMoreBtn.addEventListener('click', function() {
     fetch('/show_more_trainers', {
         method: 'GET'
     })
@@ -20,9 +11,7 @@ document.getElementById('show-more-btn').addEventListener('click', function() {
         const trainersContainer = document.getElementById('trainersContainer');
         data.trainers.forEach(trainer => {
                 
-                // Create the trainer card content here similar to the initial ones
-                // Append the content to trainerCard
-                // Create elements for each trainer card
+                // creating elements for each trainer card
                 const trainerCard = document.createElement('div');
                 trainerCard.classList.add('trainer-card');
                 trainerCard.innerHTML = `
@@ -36,15 +25,12 @@ document.getElementById('show-more-btn').addEventListener('click', function() {
                 <a href="#" class="btn home-follow-btn">Follow</a>
                 `
 
-            // Append the constructed trainer card to the trainersContainer
-            const trainersContainer = document.getElementById('trainersContainer');
+            // appending the constructed trainer card to the trainersContainer
             trainersContainer.appendChild(trainerCard);
-                
-                trainersContainer.appendChild(trainerCard);
             });          
 
         }).catch(error => {
             console.error('Error fetching trainers:', error)
         })
-    
+    showMoreBtn.remove()
 })

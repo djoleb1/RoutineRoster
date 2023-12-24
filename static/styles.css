@@ -12,22 +12,6 @@ body {
     z-index: 999;
 }
 
-.hamburger {
-    display: none;
-    cursor: pointer;
-}
-
-.bar {
-    display:block;
-    width: 25px;
-    height: 5px;
-    margin: 5px auto;
-    -webkit-transition: all 0.3s ease-in-out;
-    transition: all 0.3s ease-in-out;
-    background-color: white;
-    border-radius: 5px
-}
-
 .navbar-brand span {
     font-weight: bold;
 }
@@ -110,36 +94,3 @@ footer {
     margin: 0 auto;
 }
 
-@media(max-width:768px){
-    .hamburger {
-        display: block;
-    }
-
-    .hamburger.active .bar:nth-child(2) {
-        opacity: 0;
-    }
-    .hamburger.active .bar:nth-child(1) {
-        transform: translateY(10px) rotate(45deg);
-    }
-    .hamburger.active .bar:nth-child(3) {
-        transform: translateY(-10px) rotate(-45deg);
-    }
-
-    .nav-menu {
-        position: fixed;
-        left: -100%;
-        top: 70px;
-        gap: 0;
-        flex-direction: column;
-        background-color: #697880;
-        width: 100%;
-        transition: 0.3s;
-        text-align: center;
-    }
-    .nav-item {
-        margin: 16px 0;
-    }
-    .nav-menu.active {
-        left: 0;
-    }
-}

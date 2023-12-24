@@ -170,24 +170,35 @@ def trainers():
     if request.method == "GET":
         trainers = []
         rows = db.execute("SELECT id, username, user_type, full_name, profile_picture FROM users JOIN user_info ON users.id = user_info.users_id WHERE user_type = 'trainer';")
-        for i in range(3):
-            trainers.append(rows[i])
-        print(trainers)
+        if rows and len(rows) <= 3:
+            for i in range(len(rows)):
+                if rows[i]["full_name"]:
+                    trainers.append(rows[i])
+        elif rows and len(rows) > 3:
+            for i in range(3):
+                if rows[i]["full_name"]:
+                    trainers.append(rows[i])
+        else:
+            return render_template("home.html", trainers=trainers)
+        
         return render_template("home.html", trainers=trainers)
+    
+    
     
 @app.route("/show_more_trainers", methods=["GET"])
 @login_required
 def fetch_more_trainers():
     trainers = []
-    # Logic to fetch more trainers (e.g., next set of trainers after the initial ones)
+    # logic to fetch more trainers 
     # Assuming you already have a logic for pagination or getting the next set of trainers
     rows = db.execute("SELECT id, username, user_type, full_name, profile_picture FROM users JOIN user_info ON users.id = user_info.users_id WHERE user_type = 'trainer' LIMIT 3 OFFSET 3;")
     for row in rows:
-        trainers.append({
-            'id': row["id"],
-            'username': row["username"],
-            'user_type': row["user_type"],
-            'full_name': row["full_name"],
-            'profile_picture': row["profile_picture"]
-        })
+        if row["full_name"]:
+            trainers.append({
+                'id': row["id"],
+                'username': row["username"],
+                'user_type': row["user_type"],
+                'full_name': row["full_name"],
+                'profile_picture': row["profile_picture"]
+            })
     return jsonify({'trainers': trainers})

@@ -17,15 +17,11 @@ UPLOAD_FOLDER = 'static'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 db.execute("""CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
-                       username TEXT NOT NULL, 
-                       hash TEXT NOT NULL, 
-                       user_type TEXT NOT NULL);""")
-
-db.execute("""CREATE TABLE IF NOT EXISTS user_info ( 
-                    users_id INTEGER, 
-                    full_name TEXT, 
+                    username TEXT NOT NULL, 
+                    hash TEXT NOT NULL, 
+                    full_name TEXT,
                     profile_picture TEXT,
-                    FOREIGN KEY(users_id) REFERENCES users(id));""")
+                    user_type TEXT NOT NULL);""")
 
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
@@ -105,11 +101,6 @@ def login():
 
         # remember if user is client or trainer
         session["user_type"] = rows[0]["user_type"]
-
-        # storing id in info table so user can later upload pfp and full name if user is not present in DB
-        user_query = db.execute("SELECT * FROM user_info WHERE users_id = ?;", session["user_id"])
-        if not user_query:
-            db.execute("INSERT INTO user_info (users_id, profile_picture) VALUES (?, ?);", session["user_id"], "static/default.jpg")
         
         return redirect("/")
     
@@ -134,7 +125,7 @@ def my_account():
         username = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])
         # if user already has a pfp and full name in DB
         try:
-            data = db.execute("SELECT profile_picture, full_name FROM user_info WHERE users_id = ?", session["user_id"])
+            data = db.execute("SELECT profile_picture, full_name FROM users WHERE id = ?", session["user_id"])
             pfp = data[0]["profile_picture"]
             fname = data[0]["full_name"]
             return render_template("account.html", pfp=pfp, fname=fname, username=username[0]["username"])
@@ -155,7 +146,7 @@ def my_account():
             profile_picture.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
             picture_path = filename
-            db.execute("UPDATE user_info SET full_name = ?, profile_picture = ? WHERE users_id = ?",full_name, picture_path, session["user_id"])
+            db.execute("UPDATE users SET full_name = ?, profile_picture = ? WHERE id = ?",full_name, picture_path, session["user_id"])
 
             flash('Profile updated successfully!', 'success')
             return redirect('/')
@@ -169,7 +160,7 @@ def trainers():
     
     if request.method == "GET":
         trainers = []
-        rows = db.execute("SELECT id, username, user_type, full_name, profile_picture FROM users JOIN user_info ON users.id = user_info.users_id WHERE user_type = 'trainer';")
+        rows = db.execute("SELECT id, username, user_type, full_name, profile_picture FROM users WHERE user_type = 'trainer';")
         if rows and len(rows) <= 3:
             for i in range(len(rows)):
                 if rows[i]["full_name"]:
@@ -183,6 +174,10 @@ def trainers():
         
         return render_template("home.html", trainers=trainers)
     
+    else:
+        id = request.form.get("id")
+        print(f"id is: {id}")
+        return redirect("/")
     
     
 @app.route("/show_more_trainers", methods=["GET"])
@@ -191,7 +186,7 @@ def fetch_more_trainers():
     trainers = []
     # logic to fetch more trainers 
     # Assuming you already have a logic for pagination or getting the next set of trainers
-    rows = db.execute("SELECT id, username, user_type, full_name, profile_picture FROM users JOIN user_info ON users.id = user_info.users_id WHERE user_type = 'trainer' LIMIT 3 OFFSET 3;")
+    rows = db.execute("SELECT id, username, user_type, full_name, profile_picture FROM users WHERE user_type = 'trainer' LIMIT 3 OFFSET 3;")
     for row in rows:
         if row["full_name"]:
             trainers.append({

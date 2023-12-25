@@ -51,7 +51,9 @@ footer {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
+    min-height: 70vh;
 }
+
 .image-container {
     width: 3.8rem;
     height: 3.8rem;
@@ -94,3 +96,6 @@ footer {
     margin: 0 auto;
 }
 
+.acc-form {
+    display: flex;
+}

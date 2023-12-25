@@ -22,7 +22,10 @@ showMoreBtn.addEventListener('click', function() {
                     <h6 class="card-title"><b>${trainer.full_name}</b></h6>
                     <p>@${trainer.username}</p>
                 </div>
-                <a href="#" class="btn home-follow-btn">Follow</a>
+                <form action="/home" method="post" class="acc-form">
+                    <input type="hidden" name="id" value="${trainer.id}">
+                    <button type="submit" class="btn home-follow-btn">Follow</button>
+                </form>
                 `
 
             // appending the constructed trainer card to the trainersContainer

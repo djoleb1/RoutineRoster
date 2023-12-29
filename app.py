@@ -23,6 +23,15 @@ db.execute("""CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCRE
                     profile_picture TEXT,
                     user_type TEXT NOT NULL);""")
 
+db.execute("""CREATE TABLE IF NOT EXISTS followers (
+                    follower_id INTEGER,
+                    followed_id INTEGER,
+                    FOREIGN KEY (follower_id) REFERENCES users(id),
+                    FOREIGN KEY (followed_id) REFERENCES users(id),
+                    CONSTRAINT PK_followers PRIMARY KEY (follower_id, followed_id)
+                )""")
+
+
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -40,7 +49,7 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-    return apology("To do", 400)
+    return redirect("/home")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -156,18 +165,26 @@ def my_account():
         
 @app.route("/home", methods=["GET", "POST"])
 @login_required
-def trainers():
-    
+def trainers(): 
     if request.method == "GET":
         trainers = []
+        followed = []
+
         rows = db.execute("SELECT id, username, user_type, full_name, profile_picture FROM users WHERE user_type = 'trainer';")
+        followers = db.execute("SELECT followed_id FROM followers WHERE follower_id = ?", session["user_id"])
+
+        for follower in followers:
+            followed.append(follower["followed_id"])
+
+        print(followed)
         if rows and len(rows) <= 3:
             for i in range(len(rows)):
-                if rows[i]["full_name"]:
+                if rows[i]["full_name"] and rows[i]["id"] not in followed and rows[i]["id"] != session["user_id"]:
                     trainers.append(rows[i])
+
         elif rows and len(rows) > 3:
             for i in range(3):
-                if rows[i]["full_name"]:
+                if rows[i]["full_name"] and rows[i]["id"] not in followed and rows[i]["id"] != session["user_id"]:
                     trainers.append(rows[i])
         else:
             return render_template("home.html", trainers=trainers)
@@ -176,8 +193,8 @@ def trainers():
     
     else:
         id = request.form.get("id")
-        print(f"id is: {id}")
-        return redirect("/")
+        db.execute("INSERT INTO followers (follower_id, followed_id) VALUES (?, ?);", session["user_id"], id)
+        return redirect("/home")
     
     
 @app.route("/show_more_trainers", methods=["GET"])

@@ -167,29 +167,36 @@ def my_account():
 @login_required
 def trainers(): 
     if request.method == "GET":
-        trainers = []
+        # creating lists that will be used to store users with 'trainer' type and trainers which current user is following
+    
+        global followed
+        global rows
+        global showcased_trainers
+        all_trainers = []
         followed = []
 
+        #querying dv to find all trainers
         rows = db.execute("SELECT id, username, user_type, full_name, profile_picture FROM users WHERE user_type = 'trainer';")
+
+        #querying db to find all of the trainers that current user is following
         followers = db.execute("SELECT followed_id FROM followers WHERE follower_id = ?", session["user_id"])
 
+        # apppending all of the followed trainers to followed list so we could compare it in if/else
         for follower in followers:
             followed.append(follower["followed_id"])
 
-        print(followed)
-        if rows and len(rows) <= 3:
-            for i in range(len(rows)):
-                if rows[i]["full_name"] and rows[i]["id"] not in followed and rows[i]["id"] != session["user_id"]:
-                    trainers.append(rows[i])
+        for row in rows:
+            if row["full_name"] and row["id"] not in followed and row["id"] != session["user_id"]:
+                all_trainers.append(row)
 
-        elif rows and len(rows) > 3:
-            for i in range(3):
-                if rows[i]["full_name"] and rows[i]["id"] not in followed and rows[i]["id"] != session["user_id"]:
-                    trainers.append(rows[i])
+        if len(all_trainers) <= 3:
+            showcased_trainers = all_trainers
+            return render_template("home.html", trainers=all_trainers)
+            
         else:
-            return render_template("home.html", trainers=trainers)
-        
-        return render_template("home.html", trainers=trainers)
+            showcased_trainers = all_trainers[:3]
+            return render_template("home.html", trainers=all_trainers[:3], show_more = True)
+
     
     else:
         id = request.form.get("id")
@@ -200,12 +207,10 @@ def trainers():
 @app.route("/show_more_trainers", methods=["GET"])
 @login_required
 def fetch_more_trainers():
+    
     trainers = []
-    # logic to fetch more trainers 
-    # Assuming you already have a logic for pagination or getting the next set of trainers
-    rows = db.execute("SELECT id, username, user_type, full_name, profile_picture FROM users WHERE user_type = 'trainer' LIMIT 3 OFFSET 3;")
     for row in rows:
-        if row["full_name"]:
+        if row["full_name"] and row["id"] != session["user_id"] and row["id"] not in followed and row not in showcased_trainers:
             trainers.append({
                 'id': row["id"],
                 'username': row["username"],
@@ -213,4 +218,5 @@ def fetch_more_trainers():
                 'full_name': row["full_name"],
                 'profile_picture': row["profile_picture"]
             })
+    
     return jsonify({'trainers': trainers})

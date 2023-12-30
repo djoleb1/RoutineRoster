@@ -25,7 +25,9 @@
                        
                 </div>
             {% endfor %}
-            <button id="show-more-btn">Show More</button>
+            {% if show_more %}
+                <button id="show-more-btn">Show More</button>
+            {% endif %}
                 
         {% else %}
             <h3>Sorry, there are no trainers currently registered!</h3>

@@ -31,6 +31,12 @@ db.execute("""CREATE TABLE IF NOT EXISTS followers (
                     CONSTRAINT PK_followers PRIMARY KEY (follower_id, followed_id)
                 )""")
 
+db.execute("""CREATE TABLE IF NOT EXISTS posts (
+           id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+           trainer_id INTEGER,
+           post_content TEXT,
+           timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+           FOREIGN KEY(trainer_id) REFERENCES users(id));""")
 
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
@@ -196,8 +202,7 @@ def trainers():
         else:
             showcased_trainers = all_trainers[:3]
             return render_template("home.html", trainers=all_trainers[:3], show_more = True)
-
-    
+        
     else:
         id = request.form.get("id")
         db.execute("INSERT INTO followers (follower_id, followed_id) VALUES (?, ?);", session["user_id"], id)
@@ -220,3 +225,16 @@ def fetch_more_trainers():
             })
     
     return jsonify({'trainers': trainers})
+
+@app.route("/create_post", methods=["GET", "POST"])
+@login_required
+def create_post():
+    if request.method == 'POST':
+        content = request.json.get('content')
+        
+        print(f"Content is: {content}")
+        #db.execute("INSERT INTO posts (trainer_id, post_content) VALUES (?, ?)", session["user_id"], content)
+
+        return jsonify({'message': content})
+        
+        

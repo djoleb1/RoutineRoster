@@ -1,5 +1,4 @@
 
-let navbar = document.querySelector('.navbar');
 const showMoreBtn = document.getElementById('show-more-btn')
 
 showMoreBtn.addEventListener('click', function() {
@@ -36,4 +35,33 @@ showMoreBtn.addEventListener('click', function() {
             console.error('Error fetching trainers:', error)
         })
     showMoreBtn.remove()
+})
+
+document.getElementById("postForm").addEventListener("submit", function(event) {
+
+    event.preventDefault()
+    const content = document.getElementById('content').value;
+
+    // AJAX request to send the post content to the backend
+    fetch("/create_post", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ content: content }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Network response was not OK");
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Post created:', data.message);
+        const newPostElement = document.createElement('div');
+        newPostElement.textContent = content;
+    })
+    .catch(error => {
+        console.error('Error creating post:', error);
+    })
 })

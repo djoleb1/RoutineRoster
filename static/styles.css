@@ -51,7 +51,9 @@ footer {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
-    min-height: 70vh;
+    height: fit-content;
+    background-color: #e0e6eb;
+    border-radius: 12px;
 }
 
 .image-container {
@@ -98,4 +100,12 @@ footer {
 
 .acc-form {
     display: flex;
+}
+
+.main-wrapper {
+    display: flex;
+}
+.home-main {
+    width: 60%;
+    height: 80vh;
 }

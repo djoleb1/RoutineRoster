@@ -40,8 +40,12 @@ showMoreBtn.addEventListener('click', function() {
 document.getElementById("postForm").addEventListener("submit", function(event) {
 
     event.preventDefault()
+    const mainPage = document.getElementById('main-content')
+    const mainPosts = document.getElementById('main-posts')
     const content = document.getElementById('content').value;
-
+    
+    
+    
     // AJAX request to send the post content to the backend
     fetch("/create_post", {
         method: "POST",
@@ -57,9 +61,25 @@ document.getElementById("postForm").addEventListener("submit", function(event) {
         return response.json();
     })
     .then(data => {
-        console.log('Post created:', data.message);
+        console.log(data);
         const newPostElement = document.createElement('div');
-        newPostElement.textContent = content;
+        newPostElement.classList.add("card");
+        newPostElement.classList.add("home-trainer-post");
+
+        newPostElement.innerHTML = `
+        <div class="row no-gutters">
+            <div class="col-md-2">
+                <img src="/static/${data.profile_picture}" alt="Profile Picture" class="card-img">
+            </div>
+            <div class="col-md-10">
+                <div class="card-body">
+                    <h5 class="card-title">@${data.username}</h5>
+                    <p class="card-text">${data.message}</p>
+                </div>
+            </div>
+        </div>
+        `;
+        mainPosts.insertBefore(newPostElement, mainPosts.firstChild);
     })
     .catch(error => {
         console.error('Error creating post:', error);

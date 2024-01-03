@@ -173,13 +173,14 @@ def my_account():
 @login_required
 def trainers(): 
     if request.method == "GET":
+        #to render 'who to follow' 
         # creating lists that will be used to store users with 'trainer' type and trainers which current user is following
-    
         global followed
         global rows
         global showcased_trainers
         all_trainers = []
         followed = []
+        posts = []
 
         #querying dv to find all trainers
         rows = db.execute("SELECT id, username, user_type, full_name, profile_picture FROM users WHERE user_type = 'trainer';")
@@ -191,23 +192,28 @@ def trainers():
         for follower in followers:
             followed.append(follower["followed_id"])
 
+         # to render the posts
+        queryposts = db.execute("SELECT trainer_id, post_content, timestamp, username, profile_picture FROM posts JOIN users ON posts.trainer_id=users.id ORDER BY timestamp DESC;")
+        for post in queryposts:
+            if post["trainer_id"] in followed or post["trainer_id"] == session["user_id"]:
+                posts.append(post)
+
         for row in rows:
             if row["full_name"] and row["id"] not in followed and row["id"] != session["user_id"]:
                 all_trainers.append(row)
 
         if len(all_trainers) <= 3:
             showcased_trainers = all_trainers
-            return render_template("home.html", trainers=all_trainers)
+            return render_template("home.html", trainers=all_trainers, posts=posts)
             
         else:
             showcased_trainers = all_trainers[:3]
-            return render_template("home.html", trainers=all_trainers[:3], show_more = True)
+            return render_template("home.html", trainers=all_trainers[:3], show_more = True, posts=posts)
         
     else:
         id = request.form.get("id")
         db.execute("INSERT INTO followers (follower_id, followed_id) VALUES (?, ?);", session["user_id"], id)
         return redirect("/home")
-    
     
 @app.route("/show_more_trainers", methods=["GET"])
 @login_required
@@ -231,10 +237,14 @@ def fetch_more_trainers():
 def create_post():
     if request.method == 'POST':
         content = request.json.get('content')
-        
-        print(f"Content is: {content}")
-        #db.execute("INSERT INTO posts (trainer_id, post_content) VALUES (?, ?)", session["user_id"], content)
+        db.execute("INSERT INTO posts (trainer_id, post_content) VALUES (?, ?)", session["user_id"], content)
+        user_info = db.execute("SELECT username, profile_picture FROM users WHERE id = ?;", session["user_id"])[0]
 
-        return jsonify({'message': content})
+        return jsonify({
+            'message': content,
+            'username': user_info['username'],
+            'profile_picture': user_info['profile_picture']
+        })
+        
         
         

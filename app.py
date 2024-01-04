@@ -193,7 +193,7 @@ def trainers():
             followed.append(follower["followed_id"])
 
          # to render the posts
-        queryposts = db.execute("SELECT trainer_id, post_content, timestamp, username, profile_picture FROM posts JOIN users ON posts.trainer_id=users.id ORDER BY timestamp DESC;")
+        queryposts = db.execute("SELECT posts.id, trainer_id, post_content, timestamp, username, profile_picture FROM posts JOIN users ON posts.trainer_id=users.id ORDER BY timestamp DESC;")
         for post in queryposts:
             if post["trainer_id"] in followed or post["trainer_id"] == session["user_id"]:
                 posts.append(post)
@@ -237,14 +237,21 @@ def fetch_more_trainers():
 def create_post():
     if request.method == 'POST':
         content = request.json.get('content')
-        db.execute("INSERT INTO posts (trainer_id, post_content) VALUES (?, ?)", session["user_id"], content)
+        post_id = db.execute("INSERT INTO posts (trainer_id, post_content) VALUES (?, ?)", session["user_id"], content)
         user_info = db.execute("SELECT username, profile_picture FROM users WHERE id = ?;", session["user_id"])[0]
 
         return jsonify({
             'message': content,
             'username': user_info['username'],
+            'id': post_id,
             'profile_picture': user_info['profile_picture']
         })
         
-        
+@app.route("/delete_post", methods=["GET", "POST"])
+@login_required
+def delete_post():
+    if request.method == "POST":
+        id = request.json.get('post_id')
+        db.execute("DELETE FROM posts WHERE id = ?", id)
+        return jsonify({'Success': id})
         

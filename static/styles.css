@@ -131,4 +131,17 @@ footer {
     margin: 0.4rem auto;
 }
 
+.manage-post {
+    margin-top: 2rem;
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+}
+
+.mng-post-icon {
+    display: flex;
+    border: none;
+    background: none;
+}
+
 

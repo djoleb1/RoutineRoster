@@ -36,31 +36,40 @@
         </div>
     
         <div class="home-main" id="main-content">
+
             {% if session["user_type"] == "trainer" %}
             
                 <h2>Post a training plan for your followers:</h2>
                 <form id="postForm">
-                    <textarea name="content" id="content" placeholder="Write your training plan here..."></textarea>
+                    <textarea name="content" id="content" placeholder="Write a post for your followers..."></textarea>
                     <button type="submit">Post</button>
                 </form>
 
             {% endif %}
+
             <div id="main-posts">
-                {% for post in posts %}
-                    <div class="card home-trainer-post">
-                        <div class="row no-gutters">
-                            <div class="col-md-2">
-                                <img src="{{ url_for('static', filename=post.profile_picture ) }}" alt="Profile Picture" alt="a" class="card-img">
-                            </div>
-                            <div class="col-md-10">
-                                <div class="card-body">
-                                    <h5 class="card-title">@{{ post.username }}</h5>
-                                    <p class="card-text">{{ post.post_content }}</p>
+
+                    {% for post in posts %}
+                        <div class="card home-trainer-post" id="{{ post.id }}">
+                            <div class="row no-gutters">
+                                <div class="col-md-2">
+                                    <img src="{{ url_for('static', filename=post.profile_picture ) }}" alt="Profile Picture" alt="a" class="card-img">
                                 </div>
+                                <div class="col-md-10">
+                                    <div class="card-body">
+                                        <h5 class="card-title"><b>@{{ post.username }}</b></h5>
+                                        <p class="card-text">{{ post.post_content }}</p>
+                                    </div>
+                                    <div class="manage-post">
+                                        <button class="mng-post-icon" onclick="delete_post('{{ post.id }}')"><span class="material-symbols-outlined">close</span></button>
+                                        <button class="mng-post-icon"><span class="material-symbols-outlined">edit</span></button>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
+                    {% endfor %}
+
             </div>
         </div>
     </div>

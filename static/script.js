@@ -1,6 +1,32 @@
 
 const showMoreBtn = document.getElementById('show-more-btn')
 
+function delete_post(id) {
+    const post_id = id
+    const postCard = document.getElementById(id)
+    postCard.remove()
+
+    fetch("/delete_post", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ post_id: post_id }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Network response was not OK");
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data)
+    })
+    .catch(error => {
+        console.error('Error deleting post:', error);
+    })
+}
+
 showMoreBtn.addEventListener('click', function() {
     fetch('/show_more_trainers', {
         method: 'GET'
@@ -45,8 +71,6 @@ document.getElementById("postForm").addEventListener("submit", function(event) {
     const content = document.getElementById('content').value;
     
     
-    
-    // AJAX request to send the post content to the backend
     fetch("/create_post", {
         method: "POST",
         headers: {
@@ -65,6 +89,7 @@ document.getElementById("postForm").addEventListener("submit", function(event) {
         const newPostElement = document.createElement('div');
         newPostElement.classList.add("card");
         newPostElement.classList.add("home-trainer-post");
+        newPostElement.setAttribute("id", data.id);
 
         newPostElement.innerHTML = `
         <div class="row no-gutters">
@@ -73,8 +98,12 @@ document.getElementById("postForm").addEventListener("submit", function(event) {
             </div>
             <div class="col-md-10">
                 <div class="card-body">
-                    <h5 class="card-title">@${data.username}</h5>
+                    <h5 class="card-title"><b>@${data.username}</b></h5>
                     <p class="card-text">${data.message}</p>
+                </div>
+                <div class="manage-post">
+                    <button class="mng-post-icon" onclick="delete_post(${data.id})"><span class="material-symbols-outlined">close</span></button>
+                    <button class="mng-post-icon"><span class="material-symbols-outlined">edit</span></button>
                 </div>
             </div>
         </div>

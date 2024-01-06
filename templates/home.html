@@ -60,10 +60,14 @@
                                         <h5 class="card-title"><b>@{{ post.username }}</b></h5>
                                         <p class="card-text">{{ post.post_content }}</p>
                                     </div>
-                                    <div class="manage-post">
-                                        <button class="mng-post-icon" onclick="delete_post('{{ post.id }}')"><span class="material-symbols-outlined">close</span></button>
-                                        <button class="mng-post-icon"><span class="material-symbols-outlined">edit</span></button>
-                                    </div>
+                                    {% if post.trainer_id == session["user_id"] %}
+
+                                        <div class="manage-post">
+                                            <button class="mng-post-icon" onclick="delete_post('{{ post.id }}')"><span class="material-symbols-outlined">close</span></button>
+                                            <button class="mng-post-icon" onclick="editPost('{{ post.id }}')"><span class="material-symbols-outlined">edit</span></button>
+                                        </div>
+
+                                    {% endif %}
                                 </div>
 
                             </div>

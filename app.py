@@ -255,3 +255,12 @@ def delete_post():
         db.execute("DELETE FROM posts WHERE id = ?", id)
         return jsonify({'Success': id})
         
+@app.route("/edit_post", methods=["GET", "POST"])
+@login_required
+def edit_post():
+    if request.method == "POST":
+        post_id = request.json.get("post_id")
+        new_content = request.json.get("new_content")
+
+        db.execute("UPDATE posts SET post_content = ? WHERE id = ?;", new_content, post_id)
+        return jsonify({"id": post_id, "new_content": new_content})

@@ -1,32 +1,6 @@
 
 const showMoreBtn = document.getElementById('show-more-btn')
 
-function delete_post(id) {
-    const post_id = id
-    const postCard = document.getElementById(id)
-    postCard.remove()
-
-    fetch("/delete_post", {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ post_id: post_id }),
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Network response was not OK");
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log(data)
-    })
-    .catch(error => {
-        console.error('Error deleting post:', error);
-    })
-}
-
 showMoreBtn.addEventListener('click', function() {
     fetch('/show_more_trainers', {
         method: 'GET'
@@ -66,17 +40,20 @@ showMoreBtn.addEventListener('click', function() {
 document.getElementById("postForm").addEventListener("submit", function(event) {
 
     event.preventDefault()
-    const mainPage = document.getElementById('main-content')
     const mainPosts = document.getElementById('main-posts')
-    const content = document.getElementById('content').value;
-    
+    const content = document.getElementById('content');
+
+    if (content.value.length < 1){
+        window.alert("You cannot post an empty post!")
+        return
+    }
     
     fetch("/create_post", {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ content: content }),
+        body: JSON.stringify({ content: content.value }),
     })
     .then(response => {
         if (!response.ok) {
@@ -103,14 +80,102 @@ document.getElementById("postForm").addEventListener("submit", function(event) {
                 </div>
                 <div class="manage-post">
                     <button class="mng-post-icon" onclick="delete_post(${data.id})"><span class="material-symbols-outlined">close</span></button>
-                    <button class="mng-post-icon"><span class="material-symbols-outlined">edit</span></button>
+                    <button class="mng-post-icon" onclick="editPost(${data.id})"><span class="material-symbols-outlined">edit</span></button>
                 </div>
             </div>
         </div>
         `;
         mainPosts.insertBefore(newPostElement, mainPosts.firstChild);
+        content.value = '';
+
     })
     .catch(error => {
         console.error('Error creating post:', error);
     })
+    
 })
+
+function delete_post(id) {
+    const post_id = id
+    const postCard = document.getElementById(id)
+    postCard.remove()
+
+    fetch("/delete_post", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ post_id: post_id }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Network response was not OK");
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data)
+    })
+    .catch(error => {
+        console.error('Error deleting post:', error);
+    })
+}
+
+function editPost(id){
+    
+    // selecting the trainer card/post that will be edited
+    const trainerCard = document.getElementById(id)
+
+    // selecting the card-text class on the selected trainer card/post
+    const postTextElement = trainerCard.querySelector('.card-text');
+
+    // creating a text area in which we will edit the post content
+    const editInput = document.createElement("textarea")
+    editInput.setAttribute("id", `post${id}`)
+    editInput.name = "editPost";
+    
+    // adding the current content into a textarea
+    const currentContent = trainerCard.querySelector(".card-text").textContent.trim();
+    editInput.value = currentContent;
+
+    editInput.classList.add('form-control');
+
+    postTextElement.textContent = '';
+    postTextElement.appendChild(editInput)
+
+    const updateBtn = document.createElement("button");
+    updateBtn.innerText = "update"
+    postTextElement.appendChild(updateBtn)
+    
+    //hiding the manage-posts tab TO DO
+
+    // create an exit-post that will cancel the editing process TO DO
+
+    updateBtn.addEventListener("click", function()
+    {
+    
+        const editedContent = editInput.value.trim();
+
+        fetch("/edit_post", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ post_id: id, new_content: editedContent }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not OK");
+            }
+            return response.json();
+        })
+        .then(data => {
+            postTextElement.innerHTML = `${data.new_content}`
+            console.log(data)
+        })
+        .catch(error => {
+            console.error('Error updating post:', error);
+        })
+    })
+}
+

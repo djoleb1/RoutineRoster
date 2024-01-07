@@ -79,8 +79,8 @@ document.getElementById("postForm").addEventListener("submit", function(event) {
                     <p class="card-text">${data.message}</p>
                 </div>
                 <div class="manage-post">
-                    <button class="mng-post-icon" onclick="delete_post(${data.id})"><span class="material-symbols-outlined">close</span></button>
-                    <button class="mng-post-icon" onclick="editPost(${data.id})"><span class="material-symbols-outlined">edit</span></button>
+                    <button class="mng-post-icon" id ="deleteBtn" onclick="delete_post(${data.id})"><span class="material-symbols-outlined">close</span></button>
+                    <button class="mng-post-icon" id="editBtn" onclick="editPost(${data.id})"><span class="material-symbols-outlined">edit</span></button>
                 </div>
             </div>
         </div>
@@ -123,6 +123,8 @@ function delete_post(id) {
 
 function editPost(id){
     
+    document.getElementById('editBtn').parentNode.classList.toggle('hidden');
+
     // selecting the trainer card/post that will be edited
     const trainerCard = document.getElementById(id)
 
@@ -144,16 +146,26 @@ function editPost(id){
     postTextElement.appendChild(editInput)
 
     const updateBtn = document.createElement("button");
-    updateBtn.innerText = "update"
+    updateBtn.innerText = "Update";
+    updateBtn.classList.add('btn', 'btn-primary', 'mr-2');
     postTextElement.appendChild(updateBtn)
-    
-    //hiding the manage-posts tab TO DO
 
-    // create an exit-post that will cancel the editing process TO DO
+    const cancelBtn = document.createElement("button");
+    cancelBtn.innerText = "Cancel";
+    cancelBtn.classList.add('btn', 'btn-secondary');
+    postTextElement.appendChild(cancelBtn)
+
+    cancelBtn.addEventListener("click", function() {
+        postTextElement.innerHTML = `<p>${currentContent}</p>`;
+        document.getElementById('editBtn').parentNode.classList.toggle('hidden');
+    })
+    
+   
 
     updateBtn.addEventListener("click", function()
     {
-    
+        document.getElementById('editBtn').parentNode.classList.toggle('hidden');
+        
         const editedContent = editInput.value.trim();
 
         fetch("/edit_post", {

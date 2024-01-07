@@ -39,9 +39,9 @@
 
             {% if session["user_type"] == "trainer" %}
             
-                <h2>Post a training plan for your followers:</h2>
+                <h2>Post an update for your followers:</h2>
                 <form id="postForm">
-                    <textarea name="content" id="content" placeholder="Write a post for your followers..."></textarea>
+                    <textarea name="content" id="content" placeholder="Post an update for your followers..."></textarea>
                     <button type="submit">Post</button>
                 </form>
 
@@ -63,8 +63,8 @@
                                     {% if post.trainer_id == session["user_id"] %}
 
                                         <div class="manage-post">
-                                            <button class="mng-post-icon" onclick="delete_post('{{ post.id }}')"><span class="material-symbols-outlined">close</span></button>
-                                            <button class="mng-post-icon" onclick="editPost('{{ post.id }}')"><span class="material-symbols-outlined">edit</span></button>
+                                            <button class="mng-post-icon" id ="deleteBtn" onclick="delete_post('{{ post.id }}')"><span class="material-symbols-outlined">close</span></button>
+                                            <button class="mng-post-icon" id="editBtn" onclick="editPost('{{ post.id }}')"><span class="material-symbols-outlined">edit</span></button>
                                         </div>
 
                                     {% endif %}

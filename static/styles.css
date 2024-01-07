@@ -132,7 +132,7 @@ footer {
 }
 
 .manage-post {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     display: flex;
     width: 100%;
     justify-content: flex-end;
@@ -145,3 +145,6 @@ footer {
 }
 
 
+.hidden {
+    display: none;
+}

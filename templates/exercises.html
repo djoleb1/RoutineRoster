@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Exercises
+{% endblock %}
+
+{% block main %}
+    <h2>Exercises</h2>
+
+    <label>Choose a muscle group:</label>
+    <form action="/api/exercises" method="post" id="pick_muscle_group">
+        <select name="muscle_group" id="exercises">
+            <optgroup label="Legs">
+                <option value="abductors">Abductors</option>
+                <option value="adductors">Adductors</option>
+                <option value="calves">Calves</option>
+                <option value="glutes">Glutes</option>
+                <option value="hamstrings">Hamstrings</option>
+                <option value="quadriceps">Quadriceps</option>
+            </optgroup>
+            <optgroup label="Arms">
+                <option value="biceps">Biceps</option>
+                <option value="forearms">Forearms</option>
+                <option value="triceps">Triceps</option> 
+            </optgroup>
+            <optgroup label="Upper Body">
+                <option value="abdominals">Abdominals</option>
+                <option value="chest">Chest</option>
+                <option value="lats">Lats</option>
+                <option value="lower_back">Lower Back</option>
+                <option value="middle_back">Middle Back</option>
+                <option value="neck">Neck</option>
+                <option value="traps">Traps</option>
+                <option value="neck">Neck</option>
+            </optgroup>          
+          </select>
+          <button type="submit">Submit</button>
+    </form>
+    <div id="exercise_cards">
+
+    </div>
+{% endblock %}

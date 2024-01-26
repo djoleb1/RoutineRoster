@@ -1,11 +1,14 @@
 import os
+from dotenv import load_dotenv
 from cs50 import SQL
 from flask import Flask, flash, redirect, jsonify, render_template, request, session
+import requests
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
-
 from helpers import apology, login_required, allowed_file
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -264,3 +267,23 @@ def edit_post():
 
         db.execute("UPDATE posts SET post_content = ? WHERE id = ?;", new_content, post_id)
         return jsonify({"id": post_id, "new_content": new_content})
+    
+@app.route("/exercises")
+@login_required
+def load_exercises():
+    
+    return render_template("exercises.html")
+
+@app.route("/api/exercises", methods=["GET"])
+@login_required
+def get_exercises():
+    
+    api_key = os.getenv('API_KEY')
+    musclegroup = request.args.get("muscle_group")
+    print(f"Muslce group is: {musclegroup}")
+
+    external_api_url = f'https://api.api-ninjas.com/v1/exercises?muscle={musclegroup}'
+    headers = {'X-Api-Key': api_key}
+    response = requests.get(external_api_url, headers=headers)
+    print(f"New Response is: {response.json()}")
+    return jsonify({"exercises": response.json()})

@@ -1,5 +1,35 @@
-
 const showMoreBtn = document.getElementById('show-more-btn')
+
+document.getElementById('pick_muscle_group').addEventListener("submit", function(event) {
+
+    event.preventDefault()
+    const selectedMuscleGroup = document.getElementById('exercises').value;
+    const execrice_cards = document.getElementById('exercise_cards')
+    fetch(`/api/exercises?muscle_group=${selectedMuscleGroup}`, { method: 'GET' })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        data.exercises.forEach((row) => {
+            const exerciseArticle = document.createElement('article')
+            exerciseArticle.classList.add("exercise");
+            exerciseArticle.innerHTML = `
+            <h4>${row.name}</h3>
+            <h5>Equipment: ${row.equipment}</h5>
+            <h5>Difficulty: ${row.difficulty}</h5>
+            <p>${row.instructions}</p>
+            `
+            execrice_cards.appendChild(exerciseArticle)
+        }); 
+    })
+    .catch(error => {
+        console.error('Error fetching exercises:', error);
+    });
+
+})
 
 showMoreBtn.addEventListener('click', function() {
     fetch('/show_more_trainers', {
@@ -190,4 +220,5 @@ function editPost(id){
         })
     })
 }
+
 

@@ -285,5 +285,5 @@ def get_exercises():
     external_api_url = f'https://api.api-ninjas.com/v1/exercises?muscle={musclegroup}'
     headers = {'X-Api-Key': api_key}
     response = requests.get(external_api_url, headers=headers)
-    print(f"New Response is: {response.json()}")
+
     return jsonify({"exercises": response.json()})

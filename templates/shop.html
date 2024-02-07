@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Exercises
+{% endblock %}
+
+{% block main %}
+    <h2>Shop</h2>
+
+    <div class="finances">
+        <h6>Your balance:</h6>
+        <p class="balance">{{ balance }}</p>
+        <button onclick="balanceWindow()" id="add-balance-btn">Add balance</button>
+    </div>
+
+    <h3>Available training plans for sale:</h3>
+{% endblock %}

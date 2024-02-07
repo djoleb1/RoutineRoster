@@ -6,11 +6,22 @@
 
 {% block main %}
     <h2>Exercises</h2>
+    {% if session["user_type"] == "client" %}
+        <label>Choose a muscle group:</label>
+    {% else %}
+        <label>Create a training plan</label> <br>
+        <label>Choose a muscle group:</label>
+            <ol id="trainig-plan-tracking">
 
-    <label>Choose a muscle group:</label>
-    <form action="/api/exercises" method="post" id="pick_muscle_group">
+            </ol>
+            <div id="sell-routine-btn">
+
+            </div>
+    {% endif %}
+        <form action="/api/exercises" method="post" id="pick_muscle_group" onchange="listExercises()">
         <select name="muscle_group" id="exercises">
             <optgroup label="Legs">
+                <option value="" selected disabled hidden>Choose here</option>
                 <option value="abductors">Abductors</option>
                 <option value="adductors">Adductors</option>
                 <option value="calves">Calves</option>
@@ -34,8 +45,8 @@
                 <option value="neck">Neck</option>
             </optgroup>          
           </select>
-          <button type="submit">Submit</button>
-    </form>
+        </form>
+    <div id="exercise_muscle_type"></div>
     <div id="exercise_cards">
 
     </div>

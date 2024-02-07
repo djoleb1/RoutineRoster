@@ -144,7 +144,77 @@ footer {
     background: none;
 }
 
-
 .hidden {
     display: none;
+}
+
+.exercise {
+    padding: 0.5rem;
+    max-height: 20rem;
+    overflow: scroll;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-color: #89a2b9 #f0f0f0;
+    scrollbar-width: thin;
+}
+
+.exercise::-webkit-scrollbar {
+    width: 10px; /* Scrollbar width */
+}
+
+.exercise::-webkit-scrollbar-track {
+    background: #f0f0f0; /* Scrollbar track color */
+}
+
+.exercise::-webkit-scrollbar-thumb {
+    background-color: #89a2b9; 
+    border-radius: 5px;
+    border: 2px solid #f0f0f0;
+}
+
+#exercise_cards {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.saved-exercises-showcase {
+    width: 90%;
+    margin: 1rem auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#exercise_muscle_type {
+    margin: 1rem auto;
+}
+
+.finances {
+    position: absolute;
+    width: 14rem;
+    margin-left: 3rem;
+}
+
+#trainig-plan-tracking {
+    width: max-content;
+    margin: 1rem auto;
+    justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+
+#sell-routine-btn {
+    display: flex;
+    flex-direction: column;
+    width: max-content;
+    margin: 0 auto;
 }

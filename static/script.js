@@ -1,10 +1,9 @@
 const showMoreBtn = document.getElementById('show-more-btn')
 
-document.getElementById('pick_muscle_group').addEventListener("submit", function(event) {
-
-    event.preventDefault()
+function listExercises () {
+    
     const selectedMuscleGroup = document.getElementById('exercises').value;
-    const execrice_cards = document.getElementById('exercise_cards')
+    const execriceCards = document.getElementById('exercise_cards')
     fetch(`/api/exercises?muscle_group=${selectedMuscleGroup}`, { method: 'GET' })
     .then(response => {
         if (!response.ok) {
@@ -13,31 +12,147 @@ document.getElementById('pick_muscle_group').addEventListener("submit", function
         return response.json();
     })
     .then(data => {
+        execriceCards.innerHTML = "";
+        document.getElementById('exercise_muscle_type').innerHTML = `<h5>Exercises for ${selectedMuscleGroup}</h5>`
         data.exercises.forEach((row) => {
-            const exerciseArticle = document.createElement('article')
+            
+            const exerciseArticle = document.createElement('div')
             exerciseArticle.classList.add("exercise");
+            exerciseArticle.classList.add("card");
             exerciseArticle.innerHTML = `
-            <h4>${row.name}</h3>
-            <h5>Equipment: ${row.equipment}</h5>
-            <h5>Difficulty: ${row.difficulty}</h5>
-            <p>${row.instructions}</p>
-            `
-            execrice_cards.appendChild(exerciseArticle)
+            <div class="card-body">
+                <h5 class="card-title">${row.name}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Equipment: ${row.equipment}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">Difficulty: ${row.difficulty}</h6>
+                         <p class="card-text">${row.instructions}</p>
+                        <button onclick='saveExercise(${JSON.stringify(row)})' class="btn btn-primary">Select</button>
+            </div>
+            `;
+            execriceCards.appendChild(exerciseArticle)
+            console.log(data)
         }); 
     })
     .catch(error => {
         console.error('Error fetching exercises:', error);
     });
 
-})
+}
 
-showMoreBtn.addEventListener('click', function() {
+function saveExercise(row){
+
+    const exerciseOl = document.querySelector('#trainig-plan-tracking')
+    const exercisesList = []
+    console.log(row, "DEBUG")
+
+
+    fetch('/api/exercises', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: row.name, 
+            equipment: row.equipment,
+            difficulty: row.difficulty,
+            // instructions: row.instructions 
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Network response was not OK");
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.message != 'Exercise saved successfully!'){
+            window.alert(data.message)
+        }
+        if (data.session = 'trainer') { 
+            exercisesList.push(row.name)
+            exercisesList.forEach(exercise => {
+                li = document.createElement('li')
+                li.innerText = row.name
+                exerciseOl.appendChild(li)
+            })
+            console.log(exercisesList)
+            if (exercisesList.length > 0) {
+                document.querySelector('#sell-routine-btn').innerHTML = `<button onclick='prepareRoutine()'>Next</button>`
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error saving post:', error);
+    })
+    console.log("ROW sent from JS")
+}
+
+const exercisesArr = []
+
+function prepareRoutine() {
+    
+    const exercises = document.querySelectorAll('#trainig-plan-tracking li')
+    exercises.forEach(li => {
+        exercisesArr.push(li.textContent)
+    })
+    console.log(exercisesArr)
+
+    document.querySelector('#sell-routine-btn').innerHTML = 
+        `<label>Set a name for this routine:</label>
+            <input type="text" name="routine-name" id="routine-name">
+
+        <label>Set a price:</label>
+            <input type="number" name="routine-price" id="routine-price">
+
+        <label>Describe this routine:</label>
+            <textarea name="routine-description" id="routine-description"></textarea>
+            
+        <button onclick="submitRoutine()">Submit for sale</button>`
+}
+
+function submitRoutine() {
+    const routineName = document.querySelector('#routine-name').value
+    const routineDesc = document.querySelector('#routine-description').value
+    const routinePrice = document.querySelector('#routine-price').value
+
+    console.log(routineName)
+    console.log(routineDesc)
+    console.log(routinePrice)
+    console.log(exercisesArr)
+
+    fetch('/saveroutine', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: routineName,
+            description: routineDesc,
+            price: routinePrice,
+            exercises: exercisesArr
+        })
+    })
+    .then(response => {
+        if (!response.ok){
+            throw new Error('Network response was not OK')
+        }
+        return response.json()
+    })
+    .then(data => {
+        console.log(data)  
+    })
+    .catch(error => {
+        console.error('Error creating post:', error);
+    }) 
+}
+
+function fetchTrainers() {
     fetch('/show_more_trainers', {
         method: 'GET'
     })
     .then(response => response.json())
     .then(data => {
         const trainersContainer = document.getElementById('trainersContainer');
+
         data.trainers.forEach(trainer => {
                 
                 // creating elements for each trainer card
@@ -65,7 +180,62 @@ showMoreBtn.addEventListener('click', function() {
             console.error('Error fetching trainers:', error)
         })
     showMoreBtn.remove()
-})
+}
+function setCompleted(id) {
+    const exerciseCardId = id
+    const savedExerciseCard = document.getElementById(id)
+    savedExerciseCard.remove()
+
+    fetch('/removeexercise', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({post_id: exerciseCardId})
+    })
+    .then(response => {
+        if (!response.ok){
+            throw new Error('Network response was not OK')
+        }
+        return response.json()
+    })
+    .then(data => {
+        console.log(data)  
+        window.alert('Good job on learning this exercise!')
+    })
+    .catch(error => {
+        console.error('Error creating post:', error);
+    })
+
+}
+
+function removeExercise(id) {
+    const exerciseCardId = id
+    const savedExerciseCard = document.getElementById(id)
+    savedExerciseCard.remove()
+
+    fetch('/removeexercise', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({post_id: exerciseCardId})
+    })
+    .then(response => {
+        if (!response.ok){
+            throw new Error('Network response was not OK')
+        }
+        return response.json()
+    })
+    .then(data => {
+        console.log(data)  
+    })
+    .catch(error => {
+        console.error('Error creating post:', error);
+    })
+}
+
+
 
 document.getElementById("postForm").addEventListener("submit", function(event) {
 
@@ -221,4 +391,59 @@ function editPost(id){
     })
 }
 
+function balanceWindow() {
+    const addBtn = document.querySelector('#add-balance-btn')
+    addBtn.remove()
 
+    const financeDiv = document.querySelector('.finances')
+    form = document.createElement('div')
+    form.classList.add('balance-form')
+
+    form.innerHTML = `<label>Enter the amount you wish to add:</label><br>
+                        <input id='add-funds-amount' type='number'></input><br>
+                        <button onclick='addFunds()'>Add</button>`
+    financeDiv.appendChild(form)
+}
+
+function addFunds() {
+    const addedFunds = parseInt(document.querySelector('#add-funds-amount').value)
+    console.log(addedFunds)
+    if (addedFunds < 0) {
+        window.alert('Please enter a positive number')
+        
+    } else if (addFunds.length < 0) {
+        console.log(addFunds.length)
+        window.alert('You must input an amount')
+        
+    }
+    else {
+        fetch('/addfunds', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({amount: addedFunds})
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not OK");
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data.amount)
+            const formattedNumber = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(data.amount);
+            document.querySelector('.finances').innerHTML = `<h6>Your balance:</h6>
+                                        <p class="balance">${formattedNumber}</p>
+                                        <button onclick="balanceWindow()" id="add-balance-btn">Add balance</button>`
+        })
+        .catch(error => {
+            console.error('Error updating post:', error);
+        })
+    }
+    
+}
+
+function changed() {
+    console.log("changed")
+}

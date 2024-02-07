@@ -29,3 +29,8 @@ def login_required(f):
 
 def allowed_file(filename, set):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in set
+
+
+def usd(value):
+    """Format value as USD."""
+    return f"${value:,.2f}"

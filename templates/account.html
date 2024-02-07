@@ -37,6 +37,31 @@
                     </form>
                 </div>
             {% endif %}
+
+            {% if session["user_type"] == "client" %}
+            
+                {% if exercises %}
+                    <h4>Saved exercises:</h4>
+                        <div class="saved-exercises-showcase">
+
+                            {% for exercise in exercises %}
+                                <div class="card" id="{{ exercise.id }}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ exercise.name }}</h5>
+                                            <p class="card-text">{{ exercise.instructions }}</p>
+
+                                            <span>
+                                                <button onclick="setCompleted('{{ exercise.id }}')" class="btn btn-primary">Mark as completed</button>
+                                                <button onclick="removeExercise('{{ exercise.id }}')" class="btn btn-danger">Remove</button>
+                                            </span>
+                                            
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                {% endif %}
+                
+            {% endif %}
         </div>
     
 {% endblock %}

@@ -6,7 +6,7 @@ import requests
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
-from helpers import apology, login_required, allowed_file
+from helpers import apology, login_required, allowed_file, usd
 
 load_dotenv()
 
@@ -40,6 +40,22 @@ db.execute("""CREATE TABLE IF NOT EXISTS posts (
            post_content TEXT,
            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
            FOREIGN KEY(trainer_id) REFERENCES users(id));""")
+
+db.execute("""CREATE TABLE IF NOT EXISTS exercises (
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            user_id INTEGER,
+            name TEXT NOT NULL,
+            equipment TEXT NOT NULL,
+            difficulty TEXT NOT NULL,
+            instructions TEXT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            UNIQUE(user_id, name))""")
+
+db.execute("""CREATE TABLE IF NOT EXISTS balance (
+           user_id INTEGER,
+           balance INTEGER,
+           FOREIGN KEY (user_id) REFERENCES users(id))""")
+
 
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
@@ -140,16 +156,20 @@ def logout():
 @login_required
 def my_account():
     if request.method == "GET":
+        # checking if user has any saved exercises
+        exercises = db.execute("SELECT * FROM exercises WHERE user_id = ? ORDER BY id", session["user_id"])
+        print(f"EXERCISES: {exercises}")
+
         username = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])
         # if user already has a pfp and full name in DB
         try:
             data = db.execute("SELECT profile_picture, full_name FROM users WHERE id = ?", session["user_id"])
             pfp = data[0]["profile_picture"]
             fname = data[0]["full_name"]
-            return render_template("account.html", pfp=pfp, fname=fname, username=username[0]["username"])
+            return render_template("account.html", pfp=pfp, fname=fname, username=username[0]["username"], exercises=exercises)
         # if user doesn't have a pfp and full name in db
         except IndexError:
-            return render_template("account.html", username=username[0]["username"])
+            return render_template("account.html", username=username[0]["username"], exercises=exercises)
     else:
         # fetching data from frontend
         full_name = request.form["full_name"]
@@ -218,6 +238,17 @@ def trainers():
         db.execute("INSERT INTO followers (follower_id, followed_id) VALUES (?, ?);", session["user_id"], id)
         return redirect("/home")
     
+@app.route("/shop", methods=["GET", "POST"])
+@login_required
+def shop():
+    if request.method == "GET":
+        try:
+            balance = db.execute("SELECT balance FROM balance WHERE user_id = ?", session["user_id"])[0]["balance"]
+        except IndexError:
+            balance = 0
+
+        return render_template("shop.html", balance=usd(balance))
+    
 @app.route("/show_more_trainers", methods=["GET"])
 @login_required
 def fetch_more_trainers():
@@ -272,18 +303,69 @@ def edit_post():
 @login_required
 def load_exercises():
     
-    return render_template("exercises.html")
+    return render_template("exercises.html", session_type=session["user_type"])
 
-@app.route("/api/exercises", methods=["GET"])
+@app.route("/api/exercises", methods=["GET", "POST"])
 @login_required
 def get_exercises():
+    if request.method == "GET":
+        api_key = os.getenv('API_KEY')
+        musclegroup = request.args.get("muscle_group")
+        
+        external_api_url = f'https://api.api-ninjas.com/v1/exercises?muscle={musclegroup}'
+        headers = {'X-Api-Key': api_key}
+        response = requests.get(external_api_url, headers=headers)
+        return jsonify({"exercises": response.json()})
     
-    api_key = os.getenv('API_KEY')
-    musclegroup = request.args.get("muscle_group")
-    print(f"Muslce group is: {musclegroup}")
+    if request.method == "POST":
+        session_type = session["user_type"]
+        exercise_name = request.json.get("name")
+        equipment = request.json.get("equipment")
+        difficulty = request.json.get("difficulty")
+        instructions = request.json.get("instructions")
+        
+        if session["user_type"] != "trainer":
+            try:
+                db.execute("INSERT INTO exercises (user_id, name, equipment, difficulty, instructions) VALUES (?, ?, ?, ?, ?);", session["user_id"], exercise_name, equipment, difficulty, instructions)
+            except ValueError:
+                return jsonify({"message": "You have already saved that exercise!"})
+        
+        return jsonify({"message": "Exercise saved successfully!", "session": session_type})
 
-    external_api_url = f'https://api.api-ninjas.com/v1/exercises?muscle={musclegroup}'
-    headers = {'X-Api-Key': api_key}
-    response = requests.get(external_api_url, headers=headers)
 
-    return jsonify({"exercises": response.json()})
+@app.route("/removeexercise", methods=["GET", "POST"])
+@login_required
+def remove_exercise():
+    if request.method == "POST":
+        id = request.json.get('post_id')
+        db.execute("DELETE FROM exercises WHERE id = ?", id)
+        return jsonify({'Success': id})
+    
+@app.route("/addfunds", methods=["GET", "POST"])
+@login_required
+def add_funds():
+    if request.method == "POST":
+        amount = request.json.get("amount")
+        if not db.execute("SELECT balance FROM balance WHERE user_id = ?", session["user_id"]):
+            db.execute("INSERT INTO balance (user_id, balance) VALUES (?, ?)", session["user_id"], amount)
+            return jsonify({"message": "Success", "amount": amount})
+        else:
+            current_amount = db.execute("SELECT balance FROM balance WHERE user_id = ?", session["user_id"])[0]["balance"]
+            new_amount = current_amount + amount
+            db.execute("UPDATE balance SET balance =  ? WHERE user_id = ?", new_amount, session["user_id"])
+            return jsonify({"message": "Success", "amount": new_amount})
+        
+@app.route("/saveroutine", methods=["GET", "POST"])
+@login_required
+def saveroutine():
+    if request.method == "POST":
+        name = request.json.get("name")
+        price = request.json.get("price")
+        description = request.json.get("description")
+        exercises = request.json.get("exercises")
+        print(name)
+        print(price)
+        print(description)
+        print(exercises)
+        
+        return jsonify({"message": "ok"})

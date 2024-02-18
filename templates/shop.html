@@ -14,4 +14,37 @@
     </div>
 
     <h3>Available training plans for sale:</h3>
+
+    <div id="shop-routine-cards">
+
+        {% for routine in routines %}
+
+        <div class="container d-flex justify-content-center routine-card">
+
+            <div class="d-flex align-items-center r-card-content">
+
+                <div class="image">
+                    <h3>{{ routine.name }}</h3>
+                    <img src="{{ url_for('static', filename=routine.profile_picture ) }}" class="rounded" width="155" >
+                </div>
+
+                <div class="ml-3 w-100">
+                    
+                    <h4 class="mb-0 mt-0">{{ routine.full_name }}</h4>
+                    <p>${{ routine.price }}.00</p>
+                    <p>{{ routine.description }}</p>
+                </div>
+                {% if session["user_type"] == "client" %}
+
+                    <div class="button mt-2 d-flex flex-row align-items-center">
+                        <button class="btn btn-sm btn-primary w-100 ml-2" onclick="buyRoutine('{{ routine.id }}')">Buy</button> 
+                    </div>
+
+                {% endif %}
+            </div>
+
+        </div>
+
+        {% endfor %}
+    </div>
 {% endblock %}

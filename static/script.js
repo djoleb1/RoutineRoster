@@ -54,7 +54,7 @@ function saveExercise(row){
             name: row.name, 
             equipment: row.equipment,
             difficulty: row.difficulty,
-            // instructions: row.instructions 
+            instructions: row.instructions 
         })
     })
     .then(response => {
@@ -114,35 +114,41 @@ function submitRoutine() {
     const routineDesc = document.querySelector('#routine-description').value
     const routinePrice = document.querySelector('#routine-price').value
 
-    console.log(routineName)
-    console.log(routineDesc)
-    console.log(routinePrice)
-    console.log(exercisesArr)
-
-    fetch('/saveroutine', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            name: routineName,
-            description: routineDesc,
-            price: routinePrice,
-            exercises: exercisesArr
+    if (!routineName){
+        window.alert("Please input a name for this routine")
+    }else if (!routinePrice){
+        window.alert("Please set a price for this routine")
+    }else if(!routineDesc){
+        window.alert("Please describe this routine")
+    }else{
+        fetch('/saveroutine', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: routineName,
+                description: routineDesc,
+                price: routinePrice,
+                exercises: exercisesArr
+            })
         })
-    })
-    .then(response => {
-        if (!response.ok){
-            throw new Error('Network response was not OK')
-        }
-        return response.json()
-    })
-    .then(data => {
-        console.log(data)  
-    })
-    .catch(error => {
-        console.error('Error creating post:', error);
-    }) 
+        .then(response => {
+            if (!response.ok){
+                throw new Error('Network response was not OK')
+            }
+            return response.json()
+        })
+        .then(data => {
+            console.log(data)  
+            window.alert(data.message)
+        })
+        .catch(error => {
+            console.error('Error creating post:', error);
+        })
+    }
+
+     
 }
 
 function fetchTrainers() {
@@ -291,8 +297,7 @@ document.getElementById("postForm").addEventListener("submit", function(event) {
     })
     .catch(error => {
         console.error('Error creating post:', error);
-    })
-    
+    })  
 })
 
 function delete_post(id) {
@@ -446,4 +451,31 @@ function addFunds() {
 
 function changed() {
     console.log("changed")
+}
+
+function buyRoutine(id) {
+    routineId = id
+    console.log(id)
+
+    fetch('/shop', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }, 
+        body: JSON.stringify({
+            routineId: routineId
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Network response was not OK");
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data)
+    })
+    .catch(error => {
+        console.error('Error updating post:', error);
+    })
 }

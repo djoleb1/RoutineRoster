@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from cs50 import SQL
-from flask import Flask, flash, redirect, jsonify, render_template, request, session
+from flask import Flask, flash, redirect, jsonify, render_template, request, session, json
 import requests
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -55,6 +55,22 @@ db.execute("""CREATE TABLE IF NOT EXISTS balance (
            user_id INTEGER,
            balance INTEGER,
            FOREIGN KEY (user_id) REFERENCES users(id))""")
+
+db.execute("""CREATE TABLE IF NOT EXISTS routines (
+            id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            trainer_id INTEGER,
+            name TEXT NOT NULL,
+            price INTEGER,
+            description TEXT,
+            exercises TEXT,
+            FOREIGN KEY (trainer_id) REFERENCES users(id))
+            """)
+
+db.execute("""CREATE TABLE IF NOT EXISTS transactions (
+           buyer_id INTEGER,
+           routine_id,
+           timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )""")
 
 
 app.config["SESSION_PERMANENT"] = False
@@ -196,7 +212,7 @@ def my_account():
 @login_required
 def trainers(): 
     if request.method == "GET":
-        #to render 'who to follow' 
+        # to render 'who to follow' 
         # creating lists that will be used to store users with 'trainer' type and trainers which current user is following
         global followed
         global rows
@@ -242,12 +258,49 @@ def trainers():
 @login_required
 def shop():
     if request.method == "GET":
-        try:
-            balance = db.execute("SELECT balance FROM balance WHERE user_id = ?", session["user_id"])[0]["balance"]
-        except IndexError:
-            balance = 0
 
-        return render_template("shop.html", balance=usd(balance))
+        
+        purchased_routine_ids = []
+
+        # if user is trainer, all of his created routines are showing
+        if session["user_type"] == "trainer":
+            available_routines = db.execute("SELECT routines.id, trainer_id, name, price, description, full_name, profile_picture FROM routines JOIN users ON routines.trainer_id=users.id WHERE trainer_id = ?", session["user_id"])
+        # if the user is client, all of the not purchased routines are showing
+        else:
+            available_routines = []
+            all_routines = db.execute("SELECT routines.id, trainer_id, name, price, description, full_name, profile_picture FROM routines JOIN users ON routines.trainer_id=users.id")
+
+            # SQL query to check all routines that current user has purchased    
+            purchased_routines = db.execute("SELECT routine_id FROM transactions WHERE buyer_id = ?", session["user_id"])
+
+            # filtering out only IDs from the previous query
+            for routine in purchased_routines:
+                purchased_routine_ids.append(int(routine["routine_id"]))
+
+            print(f"PURCHASED ROUTINE IDS ARE {purchased_routine_ids}")
+
+            for routine in all_routines:
+                if routine["id"] not in purchased_routine_ids:
+                    available_routines.append(routine)
+                
+            try:
+                balance = db.execute("SELECT balance FROM balance WHERE user_id = ?", session["user_id"])[0]["balance"]
+            except IndexError:
+                balance = 0
+
+        return render_template("shop.html", balance=usd(balance), routines=available_routines)
+    if request.method == "POST":
+        routine_id = request.json.get("routineId")
+        # check the price of the routine
+        price = db.execute("SELECT price FROM routines WHERE id = ?", routine_id)
+        print(f"PRICE IS: {price}")
+        
+        db.execute("INSERT INTO transactions (buyer_id, routine_id) VALUES (?, ?)", session["user_id"], routine_id)
+        return jsonify({
+            "routine id": routine_id,
+            "status": "ok"
+        })
+
     
 @app.route("/show_more_trainers", methods=["GET"])
 @login_required
@@ -330,7 +383,10 @@ def get_exercises():
             except ValueError:
                 return jsonify({"message": "You have already saved that exercise!"})
         
-        return jsonify({"message": "Exercise saved successfully!", "session": session_type})
+        return jsonify({
+            "message": "Exercise saved successfully!", 
+            "session": session_type
+        })
 
 
 @app.route("/removeexercise", methods=["GET", "POST"])
@@ -363,9 +419,14 @@ def saveroutine():
         price = request.json.get("price")
         description = request.json.get("description")
         exercises = request.json.get("exercises")
-        print(name)
-        print(price)
-        print(description)
-        print(exercises)
+
+        # check if the name already exists in the db
+        name_exists = db.execute("SELECT * FROM routines WHERE name = ?", name)
+        if name_exists:
+            return jsonify({"message": "Routine name already exists, please choose a different name"})
         
+        exercises_string = json.dumps(exercises)    
+
+        db.execute("INSERT INTO routines (trainer_id, name, price, description, exercises) VALUES (?, ?, ?, ?, ?)", session["user_id"], name, price, description, exercises_string)
+
         return jsonify({"message": "ok"})

@@ -474,6 +474,11 @@ function buyRoutine(id) {
     })
     .then(data => {
         console.log(data)
+        if(data.status == 'Not enough balance!'){
+            window.alert(data.status)
+        }else if (data.status == 'Successfully purchased'){
+            location.reload()
+        }
     })
     .catch(error => {
         console.error('Error updating post:', error);

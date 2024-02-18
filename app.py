@@ -283,23 +283,57 @@ def shop():
                 if routine["id"] not in purchased_routine_ids:
                     available_routines.append(routine)
                 
-            try:
-                balance = db.execute("SELECT balance FROM balance WHERE user_id = ?", session["user_id"])[0]["balance"]
-            except IndexError:
-                balance = 0
+        try:
+            balance = db.execute("SELECT balance FROM balance WHERE user_id = ?", session["user_id"])[0]["balance"]
+        except IndexError:
+            balance = 0
 
-        return render_template("shop.html", balance=usd(balance), routines=available_routines)
+
+        return render_template("shop.html", routines=available_routines, balance=usd(balance))
     if request.method == "POST":
         routine_id = request.json.get("routineId")
+
         # check the price of the routine
-        price = db.execute("SELECT price FROM routines WHERE id = ?", routine_id)
-        print(f"PRICE IS: {price}")
+        price = db.execute("SELECT price FROM routines WHERE id = ?", routine_id)[0]["price"]
         
-        db.execute("INSERT INTO transactions (buyer_id, routine_id) VALUES (?, ?)", session["user_id"], routine_id)
-        return jsonify({
-            "routine id": routine_id,
-            "status": "ok"
-        })
+        # check the balance of the current user:
+        try:
+            balance = db.execute("SELECT balance FROM balance WHERE user_id = ?", session["user_id"])[0]["balance"]
+        except IndexError:
+            balance = 0
+        
+        if price > balance:
+            print("NOT ENOUGH BALANCE")
+            return jsonify({
+                "routine id": routine_id,
+                "status": "Not enough balance!"
+            })
+               
+        else:
+            db.execute("INSERT INTO transactions (buyer_id, routine_id) VALUES (?, ?)", session["user_id"], routine_id)
+
+            # subtract the routine price from the user's balance
+            db.execute("UPDATE balance SET balance = ? WHERE user_id = ?", int(balance - price), session["user_id"])
+
+            # get the ID of the trainer
+            trainer_id = db.execute("SELECT * FROM routines WHERE id = ?", routine_id)[0]["trainer_id"]
+
+            # find trainer's current balance
+            try:
+                trainer_balance = db.execute("SELECT * FROM balance WHERE user_id = ?", trainer_id)[0]["balance"]
+            except IndexError:
+                db.execute("INSERT INTO balance (user_id, balance) VALUES (?, ?)", trainer_id, 0)
+                trainer_balance = db.execute("SELECT * FROM balance WHERE user_id = ?", trainer_id)[0]["balance"]
+
+            # add the routine price to trainer's balance
+            db.execute("UPDATE balance SET balance = ? WHERE user_id = ?", int(trainer_balance + price), trainer_id)
+
+            flash("Successfully purchased a new routine!")
+
+            return jsonify({
+                "routine id": routine_id,
+                "status": "Successfully purchased"
+            })
 
     
 @app.route("/show_more_trainers", methods=["GET"])

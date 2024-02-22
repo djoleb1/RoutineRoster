@@ -220,7 +220,7 @@ footer {
     width: max-content;
     margin: 0 auto;
 }
-#shop-routine-cards {
+.shop-routine-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     margin-top: 5rem;
@@ -242,5 +242,28 @@ footer {
     justify-content: space-between;
     max-height: 30rem;
     overflow: hidden;
+}
+
+.purchased-routines-card {
+   width: 15rem;
+   margin: 0 auto;
+}
+
+.image-div {
+    width: 15rem;
+}
+
+.routine-trainer-picture {
+    width: 10rem;
+    height: 12rem;
+}
+
+.routine-account-showcase {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    margin: 5rem auto 0;
+    gap: 1rem;
+    justify-content: space-between;
+    width: 80%;
 }
 

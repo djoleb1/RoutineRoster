@@ -58,7 +58,29 @@
                                     </div>
                                 </div>
                             {% endfor %}
+                            
                         </div>
+                {% endif %}
+
+                {% if routines %}
+                <div class="routine-account-showcase">
+
+                    {% for routine in routines %}
+                        <div class="purchased-routines-card" id="{{ routine.routine_id }}">
+                            <h4>{{ routine.name }}</h4>
+                            <div class="image-div">
+                                <img class="routine-trainer-picture" src="{{ url_for('static', filename=routine.profile_picture ) }}" alt="image">
+                            </div>
+                            <h5>{{ routine.full_name }}</h5>
+                            <div class="r-card-content">
+                                <p>{{ routine.exercises|safe }}</p>
+                                <button onclick="removeRoutine('{{routine.routine_id}}')">Remove</button>
+                            </div>
+                            
+                        </div>
+                    {% endfor %}
+
+                </div>
                 {% endif %}
                 
             {% endif %}

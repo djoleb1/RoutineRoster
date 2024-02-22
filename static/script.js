@@ -484,3 +484,34 @@ function buyRoutine(id) {
         console.error('Error updating post:', error);
     })
 }
+
+function removeRoutine(id) {
+    cardId = id
+    routineCard = document.getElementById(cardId)
+    routineCard.remove()
+    routineId = parseInt(id)
+
+    console.log("Routine ID is: ", routineId)
+
+    fetch('/removeroutine', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            routineId: routineId
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Network response was not OK");
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data)
+    })
+    .catch(error => {
+        console.error('Error updating post:', error);
+    })
+}

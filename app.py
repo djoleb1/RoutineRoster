@@ -68,8 +68,9 @@ db.execute("""CREATE TABLE IF NOT EXISTS routines (
 
 db.execute("""CREATE TABLE IF NOT EXISTS transactions (
            buyer_id INTEGER,
-           routine_id,
-           timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+           routine_id INTEGER,
+           timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+           FOREIGN KEY (routine_id) REFERENCES routines(id)
         )""")
 
 
@@ -174,7 +175,14 @@ def my_account():
     if request.method == "GET":
         # checking if user has any saved exercises
         exercises = db.execute("SELECT * FROM exercises WHERE user_id = ? ORDER BY id", session["user_id"])
-        print(f"EXERCISES: {exercises}")
+        
+        # check if user has bought any routines
+        routines = db.execute("SELECT t.buyer_id, t.routine_id, r.trainer_id, r.name, r.price, r.description, r.exercises, u.full_name, u.profile_picture FROM transactions t JOIN routines r ON t.routine_id = r.id JOIN users u ON r.trainer_id = u.id WHERE t.buyer_id = ?", session["user_id"])
+
+        for routine in routines:
+            routine["exercises"] = json.loads(routine["exercises"])
+            routine["exercises"] = '<br>'.join(routine["exercises"])
+            
 
         username = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])
         # if user already has a pfp and full name in DB
@@ -182,10 +190,10 @@ def my_account():
             data = db.execute("SELECT profile_picture, full_name FROM users WHERE id = ?", session["user_id"])
             pfp = data[0]["profile_picture"]
             fname = data[0]["full_name"]
-            return render_template("account.html", pfp=pfp, fname=fname, username=username[0]["username"], exercises=exercises)
+            return render_template("account.html", pfp=pfp, fname=fname, routines=routines, username=username[0]["username"], exercises=exercises)
         # if user doesn't have a pfp and full name in db
         except IndexError:
-            return render_template("account.html", username=username[0]["username"], exercises=exercises)
+            return render_template("account.html", routines=routines, username=username[0]["username"], exercises=exercises)
     else:
         # fetching data from frontend
         full_name = request.form["full_name"]
@@ -259,7 +267,6 @@ def trainers():
 def shop():
     if request.method == "GET":
 
-        
         purchased_routine_ids = []
 
         # if user is trainer, all of his created routines are showing
@@ -463,4 +470,14 @@ def saveroutine():
 
         db.execute("INSERT INTO routines (trainer_id, name, price, description, exercises) VALUES (?, ?, ?, ?, ?)", session["user_id"], name, price, description, exercises_string)
 
+        return jsonify({"message": "ok"})
+    
+@app.route("/removeroutine", methods=["GET", "POST"])
+@login_required
+def removeroutine():
+    if request.method == "POST":
+        routine_id = request.json.get("routineId")
+        
+
+        db.execute("DELETE FROM transactions WHERE buyer_id = ? AND routine_id = ?", session["user_id"], routine_id)
         return jsonify({"message": "ok"})

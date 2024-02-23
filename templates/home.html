@@ -38,13 +38,13 @@
         <div class="home-main" id="main-content">
 
             {% if session["user_type"] == "trainer" %}
-            
-                <h2>Post an update for your followers:</h2>
-                <form id="postForm">
-                    <textarea name="content" id="content" placeholder="Post an update for your followers..."></textarea>
-                    <button type="submit">Post</button>
-                </form>
-
+                <div class="trainer-post-header">
+                    <h4>Post something:</h4>
+                    <form id="postForm">
+                        <textarea name="content" id="content" placeholder="Post an update for your followers..."></textarea>
+                        <button type="submit">Post</button>
+                    </form>
+                </div>
             {% endif %}
 
             <div id="main-posts">

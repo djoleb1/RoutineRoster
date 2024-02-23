@@ -185,12 +185,14 @@ def my_account():
             
 
         username = db.execute("SELECT username FROM users WHERE id = ?", session["user_id"])
+        
         # if user already has a pfp and full name in DB
         try:
             data = db.execute("SELECT profile_picture, full_name FROM users WHERE id = ?", session["user_id"])
             pfp = data[0]["profile_picture"]
             fname = data[0]["full_name"]
             return render_template("account.html", pfp=pfp, fname=fname, routines=routines, username=username[0]["username"], exercises=exercises)
+        
         # if user doesn't have a pfp and full name in db
         except IndexError:
             return render_template("account.html", routines=routines, username=username[0]["username"], exercises=exercises)
@@ -478,6 +480,5 @@ def removeroutine():
     if request.method == "POST":
         routine_id = request.json.get("routineId")
         
-
         db.execute("DELETE FROM transactions WHERE buyer_id = ? AND routine_id = ?", session["user_id"], routine_id)
         return jsonify({"message": "ok"})

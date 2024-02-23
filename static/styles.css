@@ -110,6 +110,18 @@ footer {
 .home-main {
     width: 60%;
     height: 80vh;
+    padding: 0 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.trainer-post-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: left;
+    text-align: left;
 }
 
 .post-image-container{
@@ -130,7 +142,18 @@ footer {
     display: flex;
     background-color: bisque;
     width: 80%; 
-    margin: 0.4rem auto;
+}
+
+#postForm {
+    display: flex;
+    gap: 1rem;
+}
+
+#postForm textarea {
+    width: 100%;
+    border: 0;
+    border-radius: 1rem;
+    padding: 0.5rem 1rem;
 }
 
 .manage-post {

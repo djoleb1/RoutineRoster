@@ -5,27 +5,33 @@
 {% endblock %}
 
 {% block main %}
-
-    <form action="/register" method="post">
-        <div>
-            <input id="username" name="username" autocomplete="off" autofocus type="text" placeholder="Username">
-        </div>
-        <div>
-            <input id="password" name="password" autocomplete="off" autofocus type="password" placeholder="Password">
-        </div>
-        <div>
-            <input id="confirmation" name="confirmation" autocomplete="off" autofocus type="password" placeholder="Confirm Password">
-        </div>
-        <div>
-            <p>Register as:</p>
-            {% for type in types %}
-                <input type="radio" id="{{ type }}" value="{{ type }}" name="reg-type">
-                <label for="trainer">{{ type.title() }}</label><br>
-            {% endfor %}
-        </div>
-        <div>
-            <button type="submit">Register</button>
-        </div>
-    </form>
+    <div class="main-register">
+        <h4>Create an account</h4>
+        <form action="/register" method="post">
+            <div>
+                <input class="form-control mx-auto w-auto" id="username" name="username" autocomplete="off" autofocus type="text" placeholder="Username">
+            </div>
+            <div>
+                <input class="form-control mx-auto w-auto" id="password" name="password" autocomplete="off" autofocus type="password" placeholder="Password">
+            </div>
+            <div>
+                <input class="form-control mx-auto w-auto" id="confirmation" name="confirmation" autocomplete="off" autofocus type="password" placeholder="Confirm Password">
+            </div>
+            <div class="register-user-types">
+                <p>Register as:</p>
+                <div class="inner-user-types">
+                    {% for type in types %}
+                        
+                        <input type="radio" id="{{ type }}" value="{{ type }}" name="reg-type">
+                        <label for="trainer">{{ type.title() }}</label> <br>
+                    
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary">Register</button>
+            </div>
+        </form>
+    </div>
 
 {% endblock %}

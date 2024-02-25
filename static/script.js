@@ -16,19 +16,30 @@ function listExercises () {
         document.getElementById('exercise_muscle_type').innerHTML = `<h5>Exercises for ${selectedMuscleGroup}</h5>`
         data.exercises.forEach((row) => {
             
-            const exerciseArticle = document.createElement('div')
+            const exerciseArticle = document.createElement('div');
+            const contentDiv = document.createElement('div');
+            const btnDiv = document.createElement('div');
+
             exerciseArticle.classList.add("exercise");
             exerciseArticle.classList.add("card");
-            exerciseArticle.innerHTML = `
+
+            contentDiv.classList.add("content-div");
+
+            contentDiv.innerHTML = `
             <div class="card-body">
                 <h5 class="card-title">${row.name}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">Equipment: ${row.equipment}</h6>
                     <h6 class="card-subtitle mb-2 text-muted">Difficulty: ${row.difficulty}</h6>
-                         <p class="card-text">${row.instructions}</p>
-                        <button onclick='saveExercise(${JSON.stringify(row)})' class="btn btn-primary">Select</button>
+                    <p class="card-text">${row.instructions}</p>
             </div>
             `;
+
+            btnDiv.classList.add('btn-container');
+            btnDiv.innerHTML = `<button onclick='saveExercise(${JSON.stringify(row)})' class="btn btn-primary">Select</button>`
+
             execriceCards.appendChild(exerciseArticle)
+            exerciseArticle.appendChild(contentDiv)
+            exerciseArticle.appendChild(btnDiv)
             console.log(data)
         }); 
     })
@@ -272,6 +283,7 @@ document.getElementById("postForm").addEventListener("submit", function(event) {
         const newPostElement = document.createElement('div');
         newPostElement.classList.add("card");
         newPostElement.classList.add("home-trainer-post");
+
         newPostElement.setAttribute("id", data.id);
 
         newPostElement.innerHTML = `
@@ -280,7 +292,7 @@ document.getElementById("postForm").addEventListener("submit", function(event) {
                 <img src="/static/${data.profile_picture}" alt="Profile Picture" class="card-img">
             </div>
             <div class="col-md-10">
-                <div class="card-body">
+                <div class="post-card-content">
                     <h5 class="card-title"><b>@${data.username}</b></h5>
                     <p class="card-text">${data.message}</p>
                 </div>

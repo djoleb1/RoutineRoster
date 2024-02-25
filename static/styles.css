@@ -2,6 +2,18 @@
     box-sizing: border-box;
 }
 
+textarea {
+    border: none;
+    overflow: auto;
+    outline: none;
+
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+
+    resize: none; 
+}
+
 body {
     background-color: #f0f5f9;
     font-family: Arial, sans-serif;
@@ -44,6 +56,31 @@ footer {
     width: 150px;
     height: 150px;
     border-radius: 50%;
+}
+
+.main-register {
+    border: 2px solid #82a7dd;
+    border-radius: 1rem;
+    padding: 1.5rem 2.5rem;
+    width: max-content;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.main-register form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.register-user-types {
+    width: max-content;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
 }
 
 .home-follow {
@@ -109,11 +146,20 @@ footer {
 }
 .home-main {
     width: 60%;
-    height: 80vh;
-    padding: 0 4rem;
+    min-height: 80vh;
+    padding: 1rem 2rem;
+    border-radius: 1rem;
     display: flex;
     flex-direction: column;
     gap: 2rem;
+    border: 1px solid lightgrey;
+    margin: 0 0 0 3rem;
+}
+
+#main-posts {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .trainer-post-header {
@@ -122,14 +168,41 @@ footer {
     justify-content: flex-start;
     align-items: left;
     text-align: left;
+    background: #fff;
+    padding: 0.65rem;
+    border-radius: 0.75rem;
+    border: 1px solid lightgray;
+}
+.trainer-post-header h5 {
+    border-bottom: 1px solid lightgray;
+    padding-bottom: 0.25rem;
 }
 
-.post-image-container{
+#trainer-post-btn {
+    background: #2196f3;
+    color: #ffffff;
+    border-radius: 1rem;
+    border: none;
+    position: absolute;
+    right: 0.3rem;
+    bottom: 0.3rem;
+    height: max-content;
+    font-size: small;
+    padding: 0.5rem 2rem;
+}
+
+/* .post-image-container {
     width: 3.8rem;
     height: 3.8rem;
     display: flex;
     border-radius: 50%;
     overflow: hidden;
+    border: 2px solid lime;
+} */
+
+.card-img {
+    width: 5rem;
+    height: 5rem;
 }
 
 .home-post-img {
@@ -140,21 +213,26 @@ footer {
 
 .home-trainer-post {
     display: flex;
-    background-color: bisque;
-    width: 80%; 
+    text-align: left;
+    background-color: #fff;
+    width: 100%; 
+    border-radius: 0.75rem;
+    padding: 0.5rem;
 }
 
 #postForm {
     display: flex;
     gap: 1rem;
+    position: relative;
 }
 
 #postForm textarea {
     width: 100%;
     border: 0;
     border-radius: 1rem;
-    padding: 0.5rem 1rem;
+    padding-right: 6rem;
 }
+
 
 .manage-post {
     margin-top: 1.5rem;
@@ -212,7 +290,7 @@ footer {
     gap: 2rem;
 }
 
-.card-body {
+.post-card-content {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -290,3 +368,12 @@ footer {
     width: 80%;
 }
 
+
+.content-div {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.btn-container {
+    margin-top: auto; 
+}

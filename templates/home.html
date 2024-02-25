@@ -26,7 +26,7 @@
                 </div>
             {% endfor %}
             {% if show_more %}
-                <button id="show-more-btn" onclick="fetchTrainers()">Show More</button>
+                <button id="show-more-btn" onclick="fetchTrainers()"><b>Show More</b></button>
             {% endif %}
                 
         {% else %}
@@ -39,40 +39,43 @@
 
             {% if session["user_type"] == "trainer" %}
                 <div class="trainer-post-header">
-                    <h4>Post something:</h4>
+                    <h5><b>Post something:</b></h5>
                     <form id="postForm">
-                        <textarea name="content" id="content" placeholder="Post an update for your followers..."></textarea>
-                        <button type="submit">Post</button>
+                        <textarea name="content" id="content" placeholder="What's on your mind?" maxlength="150" ></textarea>
+                        <button type="submit" id="trainer-post-btn">Post</button>
                     </form>
                 </div>
             {% endif %}
 
             <div id="main-posts">
+                
+                {% if not posts and session["user_type"] == "client" %}
+                    <h5>Sorry, no available posts</h5>
+                {% endif %}
 
-                    {% for post in posts %}
-                        <div class="card home-trainer-post" id="{{ post.id }}">
-                            <div class="row no-gutters">
-                                <div class="col-md-2">
-                                    <img src="{{ url_for('static', filename=post.profile_picture ) }}" alt="Profile Picture" alt="a" class="card-img">
+                {% for post in posts %}
+                    <div class="card home-trainer-post" id="{{ post.id }}">
+                        <div class="row no-gutters">
+                            <div class="col-md-2">
+                                <img src="{{ url_for('static', filename=post.profile_picture ) }}" alt="Profile Picture" alt="a" class="card-img">
+                            </div>
+                            <div class="col-md-10">
+                                <div class="post-card-content">
+                                    <h5 class="card-title"><b>@{{ post.username }}</b></h5>
+                                    <p class="card-text">{{ post.post_content }}</p>
                                 </div>
-                                <div class="col-md-10">
-                                    <div class="card-body">
-                                        <h5 class="card-title"><b>@{{ post.username }}</b></h5>
-                                        <p class="card-text">{{ post.post_content }}</p>
+
+                                {% if post.trainer_id == session["user_id"] %}
+                                    <div class="manage-post">
+                                        <button class="mng-post-icon" id ="deleteBtn" onclick="delete_post('{{ post.id }}')"><span class="material-symbols-outlined">close</span></button>
+                                        <button class="mng-post-icon" id="editBtn" onclick="editPost('{{ post.id }}')"><span class="material-symbols-outlined">edit</span></button>
                                     </div>
-                                    {% if post.trainer_id == session["user_id"] %}
-
-                                        <div class="manage-post">
-                                            <button class="mng-post-icon" id ="deleteBtn" onclick="delete_post('{{ post.id }}')"><span class="material-symbols-outlined">close</span></button>
-                                            <button class="mng-post-icon" id="editBtn" onclick="editPost('{{ post.id }}')"><span class="material-symbols-outlined">edit</span></button>
-                                        </div>
-
-                                    {% endif %}
-                                </div>
+                                {% endif %}
 
                             </div>
                         </div>
-                    {% endfor %}
+                    </div>
+                {% endfor %}
 
             </div>
         </div>

@@ -5,15 +5,26 @@
 {% endblock %}
 
 {% block main %}
-    <h2>Shop</h2>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                <h2>Shop</h2>
+                <h3>Available training plans for sale:</h3>
+            </div>
+        </div>
 
-    <div class="finances">
-        <h6>Your balance:</h6>
-        <p class="balance">{{ balance }}</p>
-        <button onclick="balanceWindow()" id="add-balance-btn">Add balance</button>
-    </div>
+        <div class="row">
+            <div class="finances col-sm-2 p-2">
+                <h6>Your balance:</h6>
+                <p>{{ balance }}</p>
 
-    <h3>Available training plans for sale:</h3>
+                {% if session["user_type"] == "client" %}
+                    <button onclick="balanceWindow()" id="add-balance-btn" class="btn btn-primary">Add balance</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>   
+    
 
     <div class="shop-routine-cards">
 
@@ -37,7 +48,7 @@
                 {% if session["user_type"] == "client" %}
 
                     <div class="button mt-2 d-flex flex-row align-items-center">
-                        <button class="btn btn-sm btn-primary w-100 ml-2" onclick="buyRoutine('{{ routine.id }}')">Buy</button> 
+                        <button class="btn btn-success w-100 ml-2" onclick="buyRoutine('{{ routine.id }}')">Buy</button> 
                     </div>
 
                 {% endif %}

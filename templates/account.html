@@ -19,7 +19,7 @@
                             <input type="text" name="full_name" placeholder="Full Name" autocomplete="off" autofocus><br>
                             <input type="file" name="profile_picture"><br>
                         </div>
-                        <input type="submit" value="Save">
+                        <input type="submit" value="Save" class="btn btn-primary">
                     </form>
                 </div>
                 
@@ -46,7 +46,7 @@
 
                             {% for exercise in exercises %}
                                 <div class="card" id="{{ exercise.id }}">
-                                    <div class="card-body">
+                                    <div class="card-body d-flex flex-column justify-content-between">
                                         <h5 class="card-title">{{ exercise.name }}</h5>
                                             <p class="card-text">{{ exercise.instructions }}</p>
 

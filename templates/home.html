@@ -10,7 +10,7 @@
             {% if trainers %}
     
             {% for trainer in trainers %}
-                <div class="trainer-card">
+                <div class="trainer-card align-items-center">
                     <div class="image-container">
                         <img src="{{ url_for('static', filename=trainer.profile_picture ) }}" alt="Profile picture" class="home-follow-image">
                     </div>

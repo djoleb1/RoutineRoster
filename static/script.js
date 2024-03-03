@@ -418,7 +418,7 @@ function balanceWindow() {
 
     form.innerHTML = `<label>Enter the amount you wish to add:</label><br>
                         <input id='add-funds-amount' type='number'></input><br>
-                        <button onclick='addFunds()'>Add</button>`
+                        <button onclick='addFunds()' class='btn btn-primary'>Add</button>`
     financeDiv.appendChild(form)
 }
 
@@ -452,7 +452,7 @@ function addFunds() {
             const formattedNumber = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(data.amount);
             document.querySelector('.finances').innerHTML = `<h6>Your balance:</h6>
                                         <p class="balance">${formattedNumber}</p>
-                                        <button onclick="balanceWindow()" id="add-balance-btn">Add balance</button>`
+                                        <button onclick="balanceWindow()" id="add-balance-btn" class='btn btn-primary'>Add balance</button>`
         })
         .catch(error => {
             console.error('Error updating post:', error);

@@ -113,7 +113,6 @@ footer {
 
 .trainer-card {
     display: flex;
-    margin: auto;
 }
 
 .main-follow-handles {
@@ -137,9 +136,6 @@ footer {
     display: flex;
 }
 
-.main-wrapper {
-    display: flex;
-}
 .home-main {
     width: 60%;
     min-height: 80vh;
@@ -147,9 +143,7 @@ footer {
     border-radius: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
     border: 1px solid lightgrey;
-    margin: 0 0 0 3rem;
 }
 
 #main-posts {
@@ -362,4 +356,15 @@ footer {
 
 .btn-container {
     margin-top: auto; 
+}
+
+@media(max-width: 1000px) {
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .home-main {
+        width: 80%;
+    }
 }

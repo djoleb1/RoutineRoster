@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block main %}
-    <div class="main-wrapper">
-        <div class="home-follow" id="trainersContainer">
+    <div class="d-lg-flex w-100 text-center wrapper">
+        <div class="home-follow mb-2 mx-2" id="trainersContainer">
             {% if trainers %}
     
             {% for trainer in trainers %}
-                <div class="trainer-card align-items-center">
+                <div class="trainer-card d-flex align-items-center">
                     <div class="image-container">
                         <img src="{{ url_for('static', filename=trainer.profile_picture ) }}" alt="Profile picture" class="home-follow-image">
                     </div>

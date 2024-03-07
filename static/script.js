@@ -1,3 +1,14 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const currentLocation = window.location.pathname;
+    const navLinks = document.querySelectorAll('.navbar-nav .nav-item .nav-link');
+
+    navLinks.forEach(link => {
+        if(link.getAttribute('href') === currentLocation) {
+            link.classList.add('text-primary'); 
+        }
+    });
+})
+
 const showMoreBtn = document.getElementById('show-more-btn')
 
 function listExercises () {
@@ -282,6 +293,7 @@ document.getElementById("postForm").addEventListener("submit", function(event) {
         console.log(data);
         const newPostElement = document.createElement('div');
         newPostElement.classList.add("card");
+        newPostElement.classList.add("mt-2");
         newPostElement.classList.add("home-trainer-post");
 
         newPostElement.setAttribute("id", data.id);

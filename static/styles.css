@@ -1,12 +1,4 @@
 textarea {
-    border: none;
-    overflow: auto;
-    outline: none;
-
-    -webkit-box-shadow: none;
-    -moz-box-shadow: none;
-    box-shadow: none;
-
     resize: none; 
 }
 
@@ -23,12 +15,7 @@ body {
 .navbar-brand span {
     font-weight: bold;
 }
-.navbar-toggler-icon {
-    background-color: #ffffff;
-}
-.nav-link {
-    color: #ffffff;
-}
+
 .nav-link:hover {
     color: #f0f5f9;
 }
@@ -248,11 +235,11 @@ footer {
 }
 
 .exercise::-webkit-scrollbar {
-    width: 10px; /* Scrollbar width */
+    width: 10px;
 }
 
 .exercise::-webkit-scrollbar-track {
-    background: #f0f0f0; /* Scrollbar track color */
+    background: #f0f0f0; 
 }
 
 .exercise::-webkit-scrollbar-thumb {
@@ -262,10 +249,8 @@ footer {
 }
 
 #exercise_cards {
-    margin-top: 2rem;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
 }
 
 .saved-exercises-showcase {
